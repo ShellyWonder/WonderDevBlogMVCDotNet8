@@ -1,4 +1,5 @@
-﻿using WonderDevBlogMVC2024.Data.Repositories;
+﻿using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Data.Repositories;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
@@ -8,10 +9,12 @@ namespace WonderDevBlogMVC2024.Services
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepository;
+        private readonly IApplicationUserRepository _applicationUserRepository;
 
-        public BlogService(IBlogRepository blogRepository)
+        public BlogService(IBlogRepository blogRepository, IApplicationUserRepository applicationUserRepository)
         {
             _blogRepository = blogRepository;
+            _applicationUserRepository = applicationUserRepository;
         }
 
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
@@ -44,6 +47,9 @@ namespace WonderDevBlogMVC2024.Services
             return await _blogRepository.BlogExistsAsync(id);
         }
 
-        
+        public async Task<IEnumerable<ApplicationUser>> GetAllAuthorsAsync()
+        {
+            return await _applicationUserRepository.GetAllUsersAsync();
+        }
     }
 }

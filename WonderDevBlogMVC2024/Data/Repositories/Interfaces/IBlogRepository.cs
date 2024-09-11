@@ -10,5 +10,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories.Interfaces
         Task UpdateBlogAsync(Blog blog);
         Task DeleteBlogAsync(int id);
         Task<bool> BlogExistsAsync(int id);
+
+        
     }
 }

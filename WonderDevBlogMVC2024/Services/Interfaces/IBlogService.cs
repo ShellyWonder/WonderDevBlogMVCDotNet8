@@ -1,4 +1,5 @@
-﻿using WonderDevBlogMVC2024.Models;
+﻿using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Models;
 
 namespace WonderDevBlogMVC2024.Services.Interfaces
 {
@@ -10,5 +11,9 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
         Task UpdateBlogAsync(Blog blog);
         Task DeleteBlogAsync(int id);
         Task<bool> BlogExistsAsync(int id);
+        Task<IEnumerable<ApplicationUser>> GetAllAuthorsAsync();
+
+
+
     }
 }
