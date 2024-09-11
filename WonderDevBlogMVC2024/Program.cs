@@ -22,6 +22,7 @@ builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.Si
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
 
 var app = builder.Build();
