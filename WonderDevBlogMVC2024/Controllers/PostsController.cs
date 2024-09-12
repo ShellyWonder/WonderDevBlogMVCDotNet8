@@ -5,25 +5,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Models;
+using WonderDevBlogMVC2024.Services;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
     public class PostsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPostService _postService;
+        private readonly IBlogService _blogService;
+        private readonly IApplicationUserService _applicationUserService;
 
-        public PostsController(ApplicationDbContext context)
+        public PostsController(IPostService postService, IBlogService blogService, IApplicationUserService applicationUserService)
         {
-            _context = context;
+            _postService = postService;
+            _blogService = blogService;
+            _applicationUserService = applicationUserService;
         }
+
+
 
         // GET: Posts
         public async Task<IActionResult> Index()
         {
-            var ApplicationDbContext = _context.Posts.Include(p => p.Author).Include(p => p.Blog);
-            return View(await ApplicationDbContext.ToListAsync());
+            var posts = await _postService.GetAllPostsAsync();  
+            return View(posts);
         }
 
         // GET: Posts/Details/5
@@ -34,10 +44,8 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var post = await _context.Posts
-                .Include(p => p.Author)
-                .Include(p => p.Blog)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var post = await _postService.GetPostByIdAsync(id.Value);
+
             if (post == null)
             {
                 return NotFound();
@@ -47,28 +55,24 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Posts/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
-            ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "Id");
+            await PopulateViewDataAsync();
             return View();
         }
 
         // POST: Posts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,BlogId,AuthorId,Title,Abstract,Content,Slug,BlogPostState,Created,Updated,ImageData,ImageType")] Post post)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(post);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await _postService.AddPostAsync(post);
+               return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", post.AuthorId);
-            ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "Id", post.BlogId);
+            await PopulateViewDataAsync(post);
             return View(post);
         }
 
@@ -80,19 +84,18 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _postService.GetPostByIdAsync(id.Value);
             if (post == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", post.AuthorId);
-            ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "Id", post.BlogId);
+
+            await PopulateViewDataAsync(post);
             return View(post);
         }
 
         // POST: Posts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,AuthorId,Title,Abstract,Content,Slug,BlogPostState,Created,Updated,ImageData,ImageType")] Post post)
@@ -104,28 +107,13 @@ namespace WonderDevBlogMVC2024.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _postService.UpdatePostAsync(post);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", post.AuthorId);
-            ViewData["BlogId"] = new SelectList(_context.Blogs, "Id", "Id", post.BlogId);
+            await PopulateViewDataAsync(post);
             return View(post);
         }
+
 
         // GET: Posts/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -135,10 +123,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var post = await _context.Posts
-                .Include(p => p.Author)
-                .Include(p => p.Blog)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var post = await _postService.GetPostByIdAsync(id.Value);
             if (post == null)
             {
                 return NotFound();
@@ -152,19 +137,22 @@ namespace WonderDevBlogMVC2024.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
-            if (post != null)
-            {
-                _context.Posts.Remove(post);
-            }
-
-            await _context.SaveChangesAsync();
+            await _postService.DeletePostAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PostExists(int id)
+        private async Task<bool> PostExists(int id)
         {
-            return _context.Posts.Any(e => e.Id == id);
+            return  await _postService.PostExistsAsync(id);
+        }
+
+        private async Task PopulateViewDataAsync(Post? post = null)
+        {
+            var authors = await _applicationUserService.GetAllUsersAsync();
+            var blogs = await _blogService.GetAllBlogsAsync();
+
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", post?.AuthorId);
+            ViewData["BlogId"] = new SelectList(blogs, "Id", "Id", post?.BlogId);
         }
     }
 }
