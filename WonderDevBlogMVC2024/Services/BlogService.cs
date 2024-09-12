@@ -9,12 +9,13 @@ namespace WonderDevBlogMVC2024.Services
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepository;
-        private readonly IApplicationUserRepository _applicationUserRepository;
+        private readonly IApplicationUserService _applicationUserService;
 
-        public BlogService(IBlogRepository blogRepository, IApplicationUserRepository applicationUserRepository)
+        public BlogService(IBlogRepository blogRepository, IApplicationUserService applicationUserService)
         {
             _blogRepository = blogRepository;
-            _applicationUserRepository = applicationUserRepository;
+            _applicationUserService = applicationUserService;
+            
         }
 
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
@@ -49,7 +50,7 @@ namespace WonderDevBlogMVC2024.Services
 
         public async Task<IEnumerable<ApplicationUser>> GetAllAuthorsAsync()
         {
-            return await _applicationUserRepository.GetAllUsersAsync();
+            return await _applicationUserService.GetAllUsersAsync();
         }
     }
 }

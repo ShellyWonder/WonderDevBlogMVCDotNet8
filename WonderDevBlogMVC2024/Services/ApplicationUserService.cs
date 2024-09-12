@@ -11,9 +11,9 @@ namespace WonderDevBlogMVC2024.Services
         {
             _applicationUserRepository = applicationUserRepository;
         }
-        public Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
-            throw new NotImplementedException();
+            return await _applicationUserRepository.GetAllUsersAsync();
         }
     }
 }
