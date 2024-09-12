@@ -7,23 +7,30 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
+using WonderDevBlogMVC2024.Services;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public CommentsController(ApplicationDbContext context)
+        private readonly ICommentService _commentService;
+        private readonly IApplicationUserService _applicationUserService;
+        private readonly IPostService _postService;
+       
+        public CommentsController(ICommentService commentService,
+                                  IApplicationUserService applicationUserService,
+                                  IPostService postService)
         {
-            _context = context;
+            _commentService = commentService;
+            _applicationUserService = applicationUserService;
+           _postService = postService;
         }
 
         // GET: Comments
         public async Task<IActionResult> Index()
         {
-            var ApplicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.Moderator).Include(c => c.Post);
-            return View(await ApplicationDbContext.ToListAsync());
+            return View(await _commentService.GetAllCommentsAsync());
         }
 
         // GET: Comments/Details/5
@@ -34,11 +41,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.Moderator)
-                .Include(c => c.Post)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentService.GetCommentByIdAsync(id.Value);
             if (comment == null)
             {
                 return NotFound();
@@ -48,30 +51,23 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Comments/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
-            ViewData["ModeratorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id");
+            await PopulateSelectLists();
             return View();
         }
 
         // POST: Comments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AuthorId,PostId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationReason")] Comment comment)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                await _commentService.CreateCommentAsync(comment);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.AuthorId);
-            ViewData["ModeratorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.ModeratorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
+            await PopulateSelectLists();
             return View(comment);
         }
 
@@ -83,20 +79,17 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _commentService.GetCommentByIdAsync(id.Value);
             if (comment == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.AuthorId);
-            ViewData["ModeratorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.ModeratorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
+            await PopulateSelectLists();
             return View(comment);
         }
 
         // POST: Comments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,PostId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationReason")] Comment comment)
@@ -110,12 +103,12 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 try
                 {
-                    _context.Update(comment);
-                    await _context.SaveChangesAsync();
+                    await _commentService.UpdateCommentAsync(comment);
+                   
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.Id))
+                    if (!await CommentExists(comment.Id))
                     {
                         return NotFound();
                     }
@@ -126,9 +119,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.AuthorId);
-            ViewData["ModeratorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", comment.ModeratorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", comment.PostId);
+            await PopulateSelectLists();
             return View(comment);
         }
 
@@ -140,11 +131,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.Moderator)
-                .Include(c => c.Post)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentService.GetCommentByIdAsync(id.Value);
             if (comment == null)
             {
                 return NotFound();
@@ -158,19 +145,25 @@ namespace WonderDevBlogMVC2024.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment != null)
-            {
-                _context.Comments.Remove(comment);
-            }
-
-            await _context.SaveChangesAsync();
+            await _commentService.DeleteCommentAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CommentExists(int id)
+        private async Task<bool> CommentExists(int id)
         {
-            return _context.Comments.Any(e => e.Id == id);
+            return await _commentService.CommentExistsAsync(id);
+        }
+
+        private async Task PopulateSelectLists(Comment? comment = null)
+        {
+            //NOTE: CHANGE VAR DEFINITIONS WHEN ROLES ARE IMPLEMENTED
+            var authors = await _applicationUserService.GetAllUsersAsync();
+            var moderators = await _applicationUserService.GetAllUsersAsync();
+            var posts = await _postService.GetAllPostsAsync();
+
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", comment?.AuthorId);
+            ViewData["ModeratorId"] = new SelectList(moderators, "Id", "Id", comment?.ModeratorId);
+            ViewData["PostId"] = new SelectList(posts, "Id", "Id", comment?.PostId);
         }
     }
 }

@@ -148,6 +148,8 @@ namespace WonderDevBlogMVC2024.Controllers
 
         private async Task PopulateViewDataAsync(Post? post = null)
         {
+
+            //NOTE: CHANGE VAR AUTHOR WHEN ROLES ARE IMPLEMENTED
             var authors = await _applicationUserService.GetAllUsersAsync();
             var blogs = await _blogService.GetAllBlogsAsync();
 
