@@ -4,14 +4,10 @@ using WonderDevBlogMVC2024.Models;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
-    public class BlogRepository : IBlogRepository
+    public class BlogRepository(ApplicationDbContext context) : IBlogRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context = context;
 
-        public BlogRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
         public async Task<bool> BlogExistsAsync(int id)
         {
             return await _context.Blogs.AnyAsync(e => e.Id == id);

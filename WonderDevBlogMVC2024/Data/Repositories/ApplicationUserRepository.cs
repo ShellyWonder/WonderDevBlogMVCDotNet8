@@ -3,16 +3,11 @@ using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
-    public class ApplicationUserRepository : IApplicationUserRepository
+    public class ApplicationUserRepository(ApplicationDbContext context) : IApplicationUserRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context = context;
 
-        public ApplicationUserRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public  async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
             return await _context.Users.ToListAsync();
         }

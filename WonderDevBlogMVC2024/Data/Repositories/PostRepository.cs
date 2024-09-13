@@ -4,14 +4,9 @@ using WonderDevBlogMVC2024.Models;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
-    public class PostRepository : IPostRepository
+    public class PostRepository(ApplicationDbContext context) : IPostRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public PostRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task AddPostAsync(Post post)
         {
