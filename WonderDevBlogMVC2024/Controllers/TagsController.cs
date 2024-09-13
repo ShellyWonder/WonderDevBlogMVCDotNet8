@@ -7,26 +7,27 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
+using WonderDevBlogMVC2024.Services;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class TagsController : Controller
+    public class TagsController(ITagsService tagsService,
+                                 IApplicationUserService applicationUserService,
+                                  IPostService postService) : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public TagsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ITagsService _tagsService = tagsService;
+        private readonly IApplicationUserService _applicationUserService = applicationUserService;
+        private readonly IPostService _postService = postService;
 
         // GET: Tags
         public async Task<IActionResult> Index()
         {
-            var ApplicationDbContext = _context.Tags.Include(t => t.Author).Include(t => t.Post);
-            return View(await ApplicationDbContext.ToListAsync());
+            var tags = await _tagsService.GetAllTagsAsync();
+            return View(tags);
         }
 
-        // GET: Tagss/Details/5
+        // GET: Tags/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,10 +35,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _context.Tags
-                .Include(t => t.Author)
-                .Include(t => t.Post)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var tag = await _tagsService.GetTagByIdAsync(id.Value);
             if (tag == null)
             {
                 return NotFound();
@@ -47,28 +45,23 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Tags/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id");
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id");
+            await PopulateDropDownLists();
             return View();
         }
 
         // POST: Tags/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PostId,AuthorId,Text")] Tag tag)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tag);
-                await _context.SaveChangesAsync();
+               await _tagsService.AddTagAsync(tag);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", tag.AuthorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", tag.PostId);
+            await PopulateDropDownLists();
             return View(tag);
         }
 
@@ -80,20 +73,18 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _context.Tags.FindAsync(id);
+            var tag = await _tagsService.GetTagByIdAsync(id.Value);
+
             if (tag == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", tag.AuthorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", tag.PostId);
+            await PopulateDropDownLists();
             return View(tag);
         }
 
         // POST: Tags/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+       [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PostId,AuthorId,Text")] Tag tag)
         {
@@ -106,8 +97,8 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 try
                 {
-                    _context.Update(tag);
-                    await _context.SaveChangesAsync();
+                   
+                    await _tagsService.UpdateTagAsync(tag);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -122,8 +113,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<ApplicationUser>(), "Id", "Id", tag.AuthorId);
-            ViewData["PostId"] = new SelectList(_context.Posts, "Id", "Id", tag.PostId);
+            await PopulateDropDownLists();
             return View(tag);
         }
 
@@ -135,10 +125,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _context.Tags
-                .Include(t => t.Author)
-                .Include(t => t.Post)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var tag = await _tagsService.GetTagByIdAsync(id.Value);
             if (tag == null)
             {
                 return NotFound();
@@ -152,19 +139,23 @@ namespace WonderDevBlogMVC2024.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
-            if (tag != null)
-            {
-                _context.Tags.Remove(tag);
-            }
-
-            await _context.SaveChangesAsync();
+            await _tagsService.DeleteTagAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool TagExists(int id)
         {
-            return _context.Tags.Any(e => e.Id == id);
+            return _tagsService.TagExists(id);
+        }
+
+        private async Task PopulateDropDownLists(Tag? tag = null)
+        {
+            //NOTE: CHANGE VAR DEFINITIONS WHEN ROLES ARE IMPLEMENTED
+            var authors = await _applicationUserService.GetAllUsersAsync();
+            var posts = await _postService.GetAllPostsAsync();
+
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", tag?.AuthorId);
+            ViewData["PostId"] = new SelectList(posts, "Id", "Id", tag?.PostId);
         }
     }
 }
