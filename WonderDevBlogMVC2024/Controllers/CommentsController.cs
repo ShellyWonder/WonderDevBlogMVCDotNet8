@@ -1,31 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
-using WonderDevBlogMVC2024.Services;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class CommentsController : Controller
+    public class CommentsController(ICommentService commentService,
+                              IApplicationUserService applicationUserService,
+                              IPostService postService) : Controller
     {
-        private readonly ICommentService _commentService;
-        private readonly IApplicationUserService _applicationUserService;
-        private readonly IPostService _postService;
-       
-        public CommentsController(ICommentService commentService,
-                                  IApplicationUserService applicationUserService,
-                                  IPostService postService)
-        {
-            _commentService = commentService;
-            _applicationUserService = applicationUserService;
-           _postService = postService;
-        }
+        private readonly ICommentService _commentService = commentService;
+        private readonly IApplicationUserService _applicationUserService = applicationUserService;
+        private readonly IPostService _postService = postService;
 
         // GET: Comments
         public async Task<IActionResult> Index()
@@ -92,7 +79,9 @@ namespace WonderDevBlogMVC2024.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,PostId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationReason")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,PostId,ModeratorId," +
+            "                                                Body,Created,Updated,Moderated,Deleted," +
+            "                                                ModeratedBody,ModerationReason")] Comment comment)
         {
             if (id != comment.Id)
             {
