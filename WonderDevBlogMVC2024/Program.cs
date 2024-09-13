@@ -23,7 +23,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ITagsRepository, TagsRepository>();
+builder.Services.AddScoped<ITagsService, TagsService>();
 
 var app = builder.Build();
 
