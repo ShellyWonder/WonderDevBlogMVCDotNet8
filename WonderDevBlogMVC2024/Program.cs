@@ -21,6 +21,8 @@ builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.Si
     .AddDefaultTokenProviders(); 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddRazorPages();
+//Add Razor components to enhance reusability
+builder.Services.AddRazorComponents();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
@@ -54,6 +56,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Register MVC route and Razor Pages
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
