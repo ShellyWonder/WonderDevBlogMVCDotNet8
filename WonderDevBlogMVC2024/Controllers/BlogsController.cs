@@ -11,14 +11,9 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class BlogsController : Controller
+    public class BlogsController(IBlogService blogService) : Controller
     {
-        private readonly IBlogService _blogService;
-
-        public BlogsController(IBlogService blogService)
-        {
-            _blogService = blogService;
-        }
+        private readonly IBlogService _blogService = blogService;
 
         // GET: Blogs
         public async Task<IActionResult> Index()
@@ -45,15 +40,16 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Blogs/Create
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            await PopulateAuthorsDropDownList();
+            
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AuthorId,Name,Description,Created,Updated,ImageData,ImageType")] Blog blog)
+        //When component is created, replace Image in bind appropriately
+        public async Task<IActionResult> Create([Bind("Name,Description,ImageData")] Blog blog)
         {
             if (ModelState.IsValid)
             {
@@ -77,14 +73,13 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 return NotFound();
             }
-             await PopulateAuthorsDropDownList();
             return View(blog);
         }
 
         // POST: Blogs/Edit/5
        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,Name,Description,Created,Updated,ImageData,ImageType")] Blog blog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageData")] Blog blog)
         {
             if (id != blog.Id)
             {

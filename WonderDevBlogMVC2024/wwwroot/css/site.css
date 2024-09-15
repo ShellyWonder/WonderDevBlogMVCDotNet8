@@ -18,5 +18,15 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: whitesmoke;
+    color: #E74C3C; /* Light text color for contrast */
+}
+
+header, footer {
+    background-color: #070D0D; /* Primary color background */
+}
+
+h1, h2 {
+    color: #2C3E50; /* Primary color text */
 }

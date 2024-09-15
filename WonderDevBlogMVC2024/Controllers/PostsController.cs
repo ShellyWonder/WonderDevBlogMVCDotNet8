@@ -65,7 +65,7 @@ namespace WonderDevBlogMVC2024.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BlogId,AuthorId,Title,Abstract,Content,Slug,BlogPostState,Created,Updated,ImageData,ImageType")] Post post)
+        public async Task<IActionResult> Create([Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageData,ImageType")] Post post)
         {
             if (ModelState.IsValid)
             {
