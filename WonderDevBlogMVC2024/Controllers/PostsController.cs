@@ -32,7 +32,7 @@ namespace WonderDevBlogMVC2024.Controllers
         // GET: Posts
         public async Task<IActionResult> Index()
         {
-            var posts = await _postService.GetAllPostsAsync();  
+            var posts = await _postService.GetAllPostsAsync();
             return View(posts);
         }
 
@@ -62,15 +62,16 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // POST: Posts/Create
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageData,ImageType")] Post post)
+        public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageData")] Post post)
         {
             if (ModelState.IsValid)
             {
+                post.Created = DateTime.Now;
                 await _postService.AddPostAsync(post);
-               return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
             await PopulateViewDataAsync(post);
             return View(post);
@@ -95,10 +96,10 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // POST: Posts/Edit/5
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,AuthorId,Title,Abstract,Content,Slug,BlogPostState,Created,Updated,ImageData,ImageType")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageData")] Post post)
         {
             if (id != post.Id)
             {
@@ -106,7 +107,8 @@ namespace WonderDevBlogMVC2024.Controllers
             }
 
             if (ModelState.IsValid)
-            {
+            {   
+                post.Updated = DateTime.Now;
                 await _postService.UpdatePostAsync(post);
                 return RedirectToAction(nameof(Index));
             }
@@ -143,18 +145,21 @@ namespace WonderDevBlogMVC2024.Controllers
 
         private async Task<bool> PostExists(int id)
         {
-            return  await _postService.PostExistsAsync(id);
+            return await _postService.PostExistsAsync(id);
         }
 
         private async Task PopulateViewDataAsync(Post? post = null)
         {
+            {
 
-            //NOTE: CHANGE VAR AUTHOR WHEN ROLES ARE IMPLEMENTED
-            var authors = await _applicationUserService.GetAllUsersAsync();
-            var blogs = await _blogService.GetAllBlogsAsync();
+                //NOTE: CHANGE VAR AUTHOR WHEN ROLES ARE IMPLEMENTED
+                var authors = await _applicationUserService.GetAllUsersAsync();
+                var blogs = await _blogService.GetAllBlogsAsync();
+                //may not use AuthorId
+                //ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", post?.AuthorId);
+                ViewData["BlogId"] = new SelectList(blogs, "Id", "Name", post?.BlogId);
 
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", post?.AuthorId);
-            ViewData["BlogId"] = new SelectList(blogs, "Id", "Id", post?.BlogId);
+            }
         }
     }
 }
