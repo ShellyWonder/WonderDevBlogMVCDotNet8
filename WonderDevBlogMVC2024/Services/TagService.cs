@@ -4,35 +4,35 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
-    public class TagsService(ITagsRepository tagsRepository) : ITagsService
+    public class TagService(ITagRepository tagRepository) : ITagService
     {
-        private readonly ITagsRepository _tagsRepository = tagsRepository;
+        private readonly ITagRepository _tagRepository = tagRepository;
 
         public async Task<IEnumerable<Tag>> GetAllTagsAsync()
         {
-            return await _tagsRepository.GetAllTagsAsync();
+            return await _tagRepository.GetAllTagsAsync();
         }
 
         public async Task<Tag?> GetTagByIdAsync(int id)
         {
-            return await _tagsRepository.GetTagByIdAsync(id);
+            return await _tagRepository.GetTagByIdAsync(id);
         }
         public async Task AddTagAsync(Tag tag)
         {
-           await _tagsRepository.AddTagAsync(tag);
+           await _tagRepository.AddTagAsync(tag);
         }
         public async Task UpdateTagAsync(Tag tag)
         {
-            await _tagsRepository.UpdateTagAsync(tag);
+            await _tagRepository.UpdateTagAsync(tag);
         }
         public async Task DeleteTagAsync(int id)
         {
-            await _tagsRepository.DeleteTagAsync(id);
+            await _tagRepository.DeleteTagAsync(id);
         }
 
         public bool TagExists(int id)
         {
-            return _tagsRepository.TagExists(id);
+            return _tagRepository.TagExists(id);
         }
 
        

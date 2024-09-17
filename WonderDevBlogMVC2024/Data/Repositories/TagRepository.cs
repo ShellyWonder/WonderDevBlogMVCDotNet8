@@ -4,7 +4,7 @@ using WonderDevBlogMVC2024.Models;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
-    public class TagsRepository(ApplicationDbContext context) : ITagsRepository
+    public class TagRepository(ApplicationDbContext context) : ITagRepository
     {
         private readonly ApplicationDbContext _context = context;
 

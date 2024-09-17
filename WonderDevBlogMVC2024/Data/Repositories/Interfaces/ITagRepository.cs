@@ -2,7 +2,7 @@
 
 namespace WonderDevBlogMVC2024.Data.Repositories.Interfaces
 {
-    public interface ITagsRepository
+    public interface ITagRepository
     {
         Task<IEnumerable<Tag>> GetAllTagsAsync();
         Task<Tag?> GetTagByIdAsync(int id);
