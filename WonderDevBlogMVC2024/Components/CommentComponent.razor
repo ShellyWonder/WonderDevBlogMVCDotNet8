@@ -1,0 +1,46 @@
+﻿@inject CommentService CommentService
+
+@if (comments is null)
+{
+    <p>Loading comments...</p>
+}
+else if (!comments.Any())
+{
+    <p>No comments yet. Be the first to comment!</p>
+}
+else
+{
+    <div class="comments mt-4">
+        <h4>Comments:</h4>
+        <ul class="list-unstyled">
+            @foreach (var comment in comments)
+            {
+                <li class="media my-4">
+                    @* <img class="mr-3 rounded-circle" src="@(comment.Author?.ProfilePicture ?? "/img/default-avatar.png")" alt="@comment.Author?.UserName" width="50" height="50"> *@
+                    <div class="media-body">
+                        <h5 class="mt-0 mb-1">@comment.Author?.UserName</h5>
+                        <p>@comment.Body</p>
+                        <small class="text-muted">Posted on @comment.Created.ToString("MMM dd, yyyy")</small>
+                        @if (comment.Updated != null)
+                        {
+                            <small class="text-muted"> | Updated on @comment.Updated?.ToString("MMM dd, yyyy")</small>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int PostId { get; set; }
+
+    private List<Comment>? comments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // comments = await CommentService.GetCommentsByPostIdAsync(PostId);
+    }
+}
+
