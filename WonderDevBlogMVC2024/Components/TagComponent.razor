@@ -1,0 +1,38 @@
+﻿@inject TagService TagService
+
+@if (tags is null)
+{
+    <p>Loading tags...</p>
+}
+else if (!tags.Any())
+{
+    <p>No tags available for this post.</p>
+}
+else
+{
+    <div class="tags mt-3">
+        <h4>Tags:</h4>
+        <ul class="list-inline">
+            @foreach (var tag in tags)
+            {
+                <li class="list-inline-item badge bg-primary">@tag.Text</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int PostId { get; set; }
+
+    private List<Tag>? tags;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // tags = await TagService.GetTagsByPostIdAsync(PostId);
+    }
+}
+
+@code {
+
+}
