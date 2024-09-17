@@ -1,0 +1,75 @@
+﻿@inject BlogService BlogService
+
+@if (post is null)
+{
+    <p><em>Loading . . .</em></p>
+}
+else
+{
+    <PageTitle>@post.Title</PageTitle>
+
+    <!-- Blog Page Banner -->
+    <div class="hero-bg" style="@($"--bg-img:url(data:{post.ImageType};base64,{Convert.ToBase64String(post.ImageData)})")">
+        <div class="hero-container-xxl d-flex flex-column flex-md-row">
+            <!-- Title content -->
+            <div class="flex-grow-1 d-flex align-items-center justify-content-center justify-content-md-end">
+                <div class="mt-3 text-center text-md-end pe-3">
+                    <h1 class="text-light">@post.Title?.ToUpper()</h1>
+                    <h2 class="text-light">@post.Abstract</h2>
+                    <span class="badge me-2 created">@post.Created.ToString("MMM dd, yyyy")</span>
+                    @if (post.Updated != null)
+                    {
+                        <span class="badge me-2 updated">@post.Updated?.ToString("MMM dd, yyyy")</span>
+                    }
+                    <div class="blog-links">
+                        <div class="d-flex justify-content-center justify-content-md-end p-3">
+                            <div class="text-center px-2">
+                                <a href="@($"/blog/{post.Slug}")" class="btn btn-outline-light rounded-pill">Go to Blog</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blog Image -->
+            <div class="order-last order-md-first d-flex justify-content-center">
+                <div class="poster-container">
+                    @if (post.ImageData.Length == 0)
+                    {
+                        <img src="/img/BlogPlaceholder.png" alt="Blog Image" class="img-fluid rounded shadow-lg" />
+                    }
+                    else
+                    {
+                        <img src="@($"data:{post.ImageType};base64,{Convert.ToBase64String(post.ImageData)}")" alt="@post.Title" class="img-fluid rounded shadow-lg" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Content -->
+    <div class="container-xxl">
+        <div class="content">
+            <p>@post.Content</p>
+
+            <!-- Tags Component -->
+            <TagComponent PostId="@post.Id" />
+
+            <!-- Comments Component -->
+            <CommentComponent PostId="@post.Id" />
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Post? post;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // post = await BlogService.GetPostDetailsAsync(Id);
+    }
+}
+
