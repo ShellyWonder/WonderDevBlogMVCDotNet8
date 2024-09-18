@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
 
-namespace WonderDevBlogMVC2024.Services
+namespace WonderDevBlogMVC2024.Data
 {
     public class DataService(ApplicationDbContext dbContext, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
     {
@@ -109,7 +108,7 @@ namespace WonderDevBlogMVC2024.Services
             {
                 await _roleManager.CreateAsync(new IdentityRole(role));
             }
-            
+
         }
     }
 }
