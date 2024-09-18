@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Data;
-using Microsoft.Extensions.DependencyInjection;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Data.Repositories;
 using WonderDevBlogMVC2024.Services;
@@ -32,10 +31,19 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<ITagsRepository, TagsRepository>();
-builder.Services.AddScoped<ITagsService, TagsService>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<DataService>();
 
 var app = builder.Build();
+
+// Call DataService to set up the database
+using (var scope = app.Services.CreateScope())
+{
+    var dataService = scope.ServiceProvider.GetRequiredService<DataService>();
+    // Call the SetupDB method to run migrations and seed roles/users
+    await dataService.SetupDB(); 
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
