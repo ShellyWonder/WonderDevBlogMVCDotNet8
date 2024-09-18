@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Services;
 
 namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
 {
@@ -29,14 +30,14 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IBlogEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IBlogEmailSender emailSender)
         {
             _userManager = userManager;
             _userStore = userStore;

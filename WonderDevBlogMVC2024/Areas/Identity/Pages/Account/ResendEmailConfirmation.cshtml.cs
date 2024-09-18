@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Services;
 
 namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
 {
@@ -21,9 +22,9 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
     public class ResendEmailConfirmationModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IBlogEmailSender _emailSender;
 
-        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IBlogEmailSender emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;
