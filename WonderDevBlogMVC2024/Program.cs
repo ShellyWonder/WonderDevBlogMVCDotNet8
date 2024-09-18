@@ -5,6 +5,7 @@ using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Data.Repositories;
 using WonderDevBlogMVC2024.Services;
 using WonderDevBlogMVC2024.Services.Interfaces;
+using WonderDevBlogMVC2024.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +20,14 @@ builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.Si
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders(); 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddRazorPages();
+
 //Add Razor components to enhance reusability
+builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents();
+
 builder.Services.AddControllersWithViews();
+
+//Register services, repositories and interfaces
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
@@ -34,6 +39,9 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<DataService>();
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddScoped<IBlogEmailSender, EmailService>();
+
 
 var app = builder.Build();
 
