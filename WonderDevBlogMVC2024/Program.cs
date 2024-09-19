@@ -41,6 +41,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<DataService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IBlogEmailSender, EmailService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 
 var app = builder.Build();
