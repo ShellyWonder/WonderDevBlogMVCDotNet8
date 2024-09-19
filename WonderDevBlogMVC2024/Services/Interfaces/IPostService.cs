@@ -8,6 +8,7 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
         Task<Post> GetPostByIdAsync(int id);
         Task AddPostAsync(Post post);
         Task UpdatePostAsync(Post post);
+        Task UpdatePostImage(int postId, IFormFile file);
         Task DeletePostAsync(int id);
         Task<bool> PostExistsAsync(int id);
     }

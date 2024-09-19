@@ -1,16 +1,14 @@
 ﻿using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
+using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
-    public class PostService : IPostService
+    public class PostService(IPostRepository postRepository, IImageService imageService) : IPostService
     {
-        private readonly IPostRepository _postRepository;
-        public PostService(IPostRepository postRepository)
-        {
-            _postRepository = postRepository;
-        }
+        private readonly IPostRepository _postRepository = postRepository;
+        private readonly IImageService _imageService = imageService;
 
         public async Task AddPostAsync(Post post)
         {
@@ -39,6 +37,19 @@ namespace WonderDevBlogMVC2024.Services
 
         public async Task UpdatePostAsync(Post post)
         {
+            await _postRepository.UpdatePostAsync(post);
+        }
+
+        public  async Task UpdatePostImage(int postId, IFormFile file)
+        {
+            //null check using coalesce operator
+            var post = await _postRepository.GetPostByIdAsync(postId) ?? throw new Exception("Post not found");
+            var imageData = await _imageService.ConvertFileToByteArrayAsync(file);
+            var imageType = _imageService.GetFileType(file);
+
+            post.ImageData = imageData;
+            post.ImageType = Enum.Parse<ImageType>(imageType, true);
+
             await _postRepository.UpdatePostAsync(post);
         }
     }
