@@ -12,11 +12,11 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class TagsController(ITagsService tagsService,
+    public class TagsController(ITagService tagsService,
                                  IApplicationUserService applicationUserService,
                                   IPostService postService) : Controller
     {
-        private readonly ITagsService _tagsService = tagsService;
+        private readonly ITagService _tagsService = tagsService;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
         private readonly IPostService _postService = postService;
 

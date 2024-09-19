@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using WonderDevBlogMVC2024.Models;
-using WonderDevBlogMVC2024.Services;
+using WonderDevBlogMVC2024.Services.Interfaces;
 using WonderDevBlogMVC2024.ViewModels;
 
 namespace WonderDevBlogMVC2024.Controllers
