@@ -6,6 +6,7 @@ using WonderDevBlogMVC2024.Data.Repositories;
 using WonderDevBlogMVC2024.Services;
 using WonderDevBlogMVC2024.Services.Interfaces;
 using WonderDevBlogMVC2024.ViewModels;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,12 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.AddScoped<IBlogEmailSender, EmailService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 
+//configuring max file sizes in form uploads
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1024 * 1024 * 10; // 10MB
+});
+
 
 var app = builder.Build();
 
@@ -72,6 +79,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+
 
 // Register MVC route and Razor Pages
 app.MapControllerRoute(
