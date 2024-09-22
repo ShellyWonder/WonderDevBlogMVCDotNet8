@@ -1,5 +1,4 @@
 ﻿using WonderDevBlogMVC2024.Data;
-using WonderDevBlogMVC2024.Data.Repositories;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
@@ -7,11 +6,11 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
-    public class BlogService(IBlogRepository blogRepository, IApplicationUserService applicationUserService, IImageService imageService) : IBlogService
+    public class BlogService(IBlogRepository blogRepository, IApplicationUserService applicationUserService) : IBlogService
     {
         private readonly IBlogRepository _blogRepository = blogRepository;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
-        private readonly IImageService _imageService = imageService;
+        
 
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
         {
@@ -23,27 +22,14 @@ namespace WonderDevBlogMVC2024.Services
             return await _blogRepository.GetBlogByIdAsync(id);
         }
 
-        public async Task CreateBlogAsync(Blog blog)
+        public async Task CreateBlogAsync(Blog blog, string userId)
         {
-            await _blogRepository.CreateBlogAsync(blog);
+            await _blogRepository.CreateBlogAsync(blog,userId);
         }
 
-        public async Task UpdateBlogAsync(Blog blog)
+        public async Task UpdateBlogAsync(Blog blog, string userId)
         {
-            await _blogRepository.UpdateBlogAsync(blog);
-        }
-
-        public async Task UpdateBlogImage(int blogId, IFormFile file)
-        {
-            //null check using coalesce operator
-            var blog = await _blogRepository.GetBlogByIdAsync(blogId) ?? throw new Exception("Blog not found");
-            var imageData = await _imageService.ConvertFileToByteArrayAsync(file);
-            var imageType = _imageService.GetFileType(file);
-
-            blog.ImageData = imageData;
-            blog.ImageType = Enum.Parse<ImageType>(imageType, true);
-
-            await _blogRepository.UpdateBlogAsync(blog);
+            await _blogRepository.UpdateBlogAsync(blog, userId);
         }
 
         public async Task DeleteBlogAsync(int id)
@@ -59,6 +45,16 @@ namespace WonderDevBlogMVC2024.Services
         public async Task<IEnumerable<ApplicationUser>> GetAllAuthorsAsync()
         {
             return await _applicationUserService.GetAllUsersAsync();
+        }
+
+        public Task CreateBlogAsync(Blog blog)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateBlogAsync(Blog blog)
+        {
+            throw new NotImplementedException();
         }
     }
 }
