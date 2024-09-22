@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+using System.Reflection.Metadata;
 using WonderDevBlogMVC2024.Data;
-using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.Models;
-using WonderDevBlogMVC2024.Services;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class PostsController : Controller
+    public class PostsController(IPostService postService, IBlogService blogService, 
+                                 IApplicationUserService applicationUserService, 
+                                 IImageService imageService,
+                                 UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly IPostService _postService;
-        private readonly IBlogService _blogService;
-        private readonly IApplicationUserService _applicationUserService;
-
-        public PostsController(IPostService postService, IBlogService blogService, IApplicationUserService applicationUserService)
-        {
-            _postService = postService;
-            _blogService = blogService;
-            _applicationUserService = applicationUserService;
-        }
-
+        private readonly IPostService _postService = postService;
+        private readonly IBlogService _blogService = blogService;
+        private readonly IApplicationUserService _applicationUserService = applicationUserService;
+        private readonly IImageService _imageService = imageService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
 
         // GET: Posts
@@ -55,6 +47,7 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Posts/Create
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             await PopulateViewDataAsync();
@@ -65,12 +58,16 @@ namespace WonderDevBlogMVC2024.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageData")] Post post)
+        public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post)
         {
             if (ModelState.IsValid)
             {
-                post.Created = DateTime.Now;
-                await _postService.AddPostAsync(post);
+                // Get the current user ID
+                var userId = _userManager.GetUserId(User);
+                // Convert the uploaded image to a byte array and store it in database
+                await ImageImplementation(post);
+                // Pass userId to the service/repository
+                await _postService.AddPostAsync(post,userId!);
                 return RedirectToAction(nameof(Index));
             }
             await PopulateViewDataAsync(post);
@@ -99,7 +96,7 @@ namespace WonderDevBlogMVC2024.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageData")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post)
         {
             if (id != post.Id)
             {
@@ -107,9 +104,18 @@ namespace WonderDevBlogMVC2024.Controllers
             }
 
             if (ModelState.IsValid)
-            {   
-                post.Updated = DateTime.Now;
-                await _postService.UpdatePostAsync(post);
+            {
+                // Get the current user ID
+                var userId = _userManager.GetUserId(User);
+
+                // Check if a new image has been uploaded
+                if (post.ImageFile != null)
+                {
+                    // Convert the uploaded image to a byte array and store it in the database
+                    await ImageImplementation(post);
+                }
+                // Pass userId to the service/repository,updating the rest of the post
+                await _postService.UpdatePostAsync(post, userId!);
                 return RedirectToAction(nameof(Index));
             }
             await PopulateViewDataAsync(post);
@@ -159,6 +165,21 @@ namespace WonderDevBlogMVC2024.Controllers
                 //ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", post?.AuthorId);
                 ViewData["BlogId"] = new SelectList(blogs, "Id", "Name", post?.BlogId);
 
+            }
+        }
+        private async Task ImageImplementation(Post post)
+        {
+            if (post.ImageFile != null)
+            {
+                post.ImageData = await _imageService.ConvertFileToByteArrayAsync(post.ImageFile);
+                post.ImageType = post.ImageFile.ContentType;
+            }
+            else
+            {
+                // Assign default image if no image is uploaded
+                var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "default_icon.png");
+                post.ImageData = await System.IO.File.ReadAllBytesAsync(defaultImagePath);
+                post.ImageType = "image/png";
             }
         }
     }

@@ -8,12 +8,19 @@ namespace WonderDevBlogMVC2024.Data.Repositories
     {
         private readonly ApplicationDbContext _context = context;
 
-        public async Task AddPostAsync(Post post)
+        public async Task AddPostAsync(Post post, string userId)
         {
+            post.Created = DateTime.Now;
+            post.AuthorId = userId;
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
         }
-
+        public async Task UpdatePostAsync(Post post, string userId)
+        {
+            post.Updated = DateTime.Now;
+            _context.Posts.Update(post);
+            await _context.SaveChangesAsync();
+        }
         public async Task DeletePostAsync(int id)
         {
             var post = await _context.Posts.FindAsync(id);
@@ -52,10 +59,5 @@ namespace WonderDevBlogMVC2024.Data.Repositories
             return await _context.Posts.AnyAsync(p => p.Id == id);
         }
 
-        public async Task UpdatePostAsync(Post post)
-        {
-            _context.Posts.Update(post);
-            await _context.SaveChangesAsync();
-        }
     }
 }

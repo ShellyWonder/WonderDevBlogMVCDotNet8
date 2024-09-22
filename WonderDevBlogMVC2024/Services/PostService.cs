@@ -5,14 +5,18 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
-    public class PostService(IPostRepository postRepository, IImageService imageService) : IPostService
+    public class PostService(IPostRepository postRepository) : IPostService
     {
         private readonly IPostRepository _postRepository = postRepository;
-        private readonly IImageService _imageService = imageService;
+        
 
-        public async Task AddPostAsync(Post post)
+        public async Task AddPostAsync(Post post, string userId)
         {
-            await _postRepository.AddPostAsync(post);
+            await _postRepository.AddPostAsync(post, userId);
+        }
+        public async Task UpdatePostAsync(Post post, string userId)
+        {
+            await _postRepository.UpdatePostAsync(post, userId);
         }
 
         public  async Task DeletePostAsync(int id)
@@ -35,22 +39,5 @@ namespace WonderDevBlogMVC2024.Services
             return await _postRepository.PostExistsAsync(id);
         }
 
-        public async Task UpdatePostAsync(Post post)
-        {
-            await _postRepository.UpdatePostAsync(post);
-        }
-
-        public  async Task UpdatePostImage(int postId, IFormFile file)
-        {
-            //null check using coalesce operator
-            var post = await _postRepository.GetPostByIdAsync(postId) ?? throw new Exception("Post not found");
-            var imageData = await _imageService.ConvertFileToByteArrayAsync(file);
-            var imageType = _imageService.GetFileType(file);
-
-            post.ImageData = imageData;
-            post.ImageType = imageType;
-
-            await _postRepository.UpdatePostAsync(post);
-        }
     }
 }
