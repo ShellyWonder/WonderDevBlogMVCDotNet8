@@ -48,7 +48,7 @@ namespace WonderDevBlogMVC2024.Services
             var imageType = _imageService.GetFileType(file);
 
             post.ImageData = imageData;
-            post.ImageType = Enum.Parse<ImageType>(imageType, true);
+            post.ImageType = imageType;
 
             await _postRepository.UpdatePostAsync(post);
         }

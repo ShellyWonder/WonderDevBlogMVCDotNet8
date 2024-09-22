@@ -22,7 +22,7 @@ namespace WonderDevBlogMVC2024.Services
             var imageType = _imageService.GetFileType(file);
 
             user.ImageData = imageData;
-            user.ImageType = Enum.Parse<ImageType>(imageType, true);
+            user.ImageType = imageType;
 
             await _applicationUserRepository.UpdateUserImageAsync(user);
         }
