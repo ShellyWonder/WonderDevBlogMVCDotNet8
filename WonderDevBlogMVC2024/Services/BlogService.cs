@@ -47,14 +47,6 @@ namespace WonderDevBlogMVC2024.Services
             return await _applicationUserService.GetAllUsersAsync();
         }
 
-        public Task CreateBlogAsync(Blog blog)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateBlogAsync(Blog blog)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

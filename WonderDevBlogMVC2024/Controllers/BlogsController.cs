@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
+using System.Reflection.Metadata;
 using WonderDevBlogMVC2024.Data;
-using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
@@ -57,12 +58,8 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 // Get the current user ID
                 var userId = _userManager.GetUserId(User);
-                // Convert the uploaded image to a byte array and store it in Image
-                if (blog.ImageFile != null)
-                {
-                    blog.Image = await _imageService.ConvertFileToByteArrayAsync(blog.ImageFile);
-                    blog.ImageType = blog.ImageFile.ContentType;
-                }
+                // Convert the uploaded image to a byte array and store it in database
+                await ImageImplementation(blog);
                 // Pass userId to the service/repository
                 await _blogService.CreateBlogAsync(blog,userId!);
                 return RedirectToAction(nameof(Index));
@@ -91,7 +88,7 @@ namespace WonderDevBlogMVC2024.Controllers
         // POST: Blogs/Edit/5
        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageData")] Blog blog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageFile")] Blog blog)
         {
             if (id != blog.Id)
             {
@@ -100,7 +97,16 @@ namespace WonderDevBlogMVC2024.Controllers
 
             if (ModelState.IsValid)
             {
-                await _blogService.UpdateBlogAsync(blog);
+                // Get the current user ID
+                var userId = _userManager.GetUserId(User);
+                // Check if a new image has been uploaded
+                if (blog.ImageFile != null)
+                {
+                    // Convert the uploaded image to a byte array and store it in the database
+                    await ImageImplementation(blog);
+                }
+                // Pass userId to the service/repository to update the rest of the blog
+                await _blogService.UpdateBlogAsync(blog, userId!);
                 return RedirectToAction(nameof(Index));
             }
             return View(blog);
@@ -140,6 +146,21 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             var authors = await _blogService.GetAllAuthorsAsync();
             ViewData["AuthorId"] = new SelectList(authors, "Id", "FullName", selectedAuthor);
+        }
+        private async Task ImageImplementation(Blog blog)
+        {
+            if (blog.ImageFile != null)
+            {
+                blog.Image = await _imageService.ConvertFileToByteArrayAsync(blog.ImageFile);
+                blog.ImageType = blog.ImageFile.ContentType;
+            }
+            else
+            {
+                // Assign default image if no image is uploaded
+                var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "default_icon.png");
+                blog.Image = await System.IO.File.ReadAllBytesAsync(defaultImagePath);
+                blog.ImageType = "image/png";  
+            }
         }
     }
 }
