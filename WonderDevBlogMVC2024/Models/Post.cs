@@ -36,8 +36,7 @@ namespace WonderDevBlogMVC2024.Models
 
         public byte[] ImageData { get; set; } = Array.Empty<byte>();
 
-        [Display(Name = "Select Image Type")]
-        public ImageType ImageType { get; set; }
+        public string? ImageType { get; set; }
 
         // This will be used to upload the file from the form.
         [NotMapped]

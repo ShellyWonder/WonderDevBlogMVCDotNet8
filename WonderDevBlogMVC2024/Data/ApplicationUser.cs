@@ -21,7 +21,7 @@ namespace WonderDevBlogMVC2024.Data
         [Display(Name = "User Profile Image")]
         public byte[]? ImageData { get; set; }
 
-        public ImageType ImageType { get; set; }
+        public string? ImageType { get; set; }
 
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
         [Display(Name = "GitHub Url")]

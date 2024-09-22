@@ -29,7 +29,7 @@ namespace WonderDevBlogMVC2024.Models
         public byte[]? Image { get; set; }
 
         [Display(Name = "Image Type")]
-        public ImageType ImageType { get; set; }
+        public string? ImageType { get; set; }
 
         // This will be used to upload the file from the form.
         [NotMapped]
