@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WonderDevBlogMVC2024.Data;
 
@@ -11,9 +12,11 @@ using WonderDevBlogMVC2024.Data;
 namespace WonderDevBlogMVC2024.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921201751_002")]
+    partial class _002
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -260,8 +263,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
@@ -271,8 +273,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
@@ -297,9 +298,6 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.Property<string>("Body")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CommentorId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -329,8 +327,6 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("CommentorId");
-
                     b.HasIndex("ModeratorId");
 
                     b.HasIndex("PostId");
@@ -347,8 +343,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abstract")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AuthorId")
                         .HasColumnType("nvarchar(450)");
@@ -376,8 +371,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
@@ -483,10 +477,6 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                         .WithMany()
                         .HasForeignKey("AuthorId");
 
-                    b.HasOne("WonderDevBlogMVC2024.Data.ApplicationUser", "Commentor")
-                        .WithMany()
-                        .HasForeignKey("CommentorId");
-
                     b.HasOne("WonderDevBlogMVC2024.Data.ApplicationUser", "Moderator")
                         .WithMany()
                         .HasForeignKey("ModeratorId");
@@ -498,8 +488,6 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Author");
-
-                    b.Navigation("Commentor");
 
                     b.Navigation("Moderator");
 

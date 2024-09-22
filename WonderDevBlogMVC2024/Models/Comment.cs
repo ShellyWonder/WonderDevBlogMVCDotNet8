@@ -5,14 +5,14 @@ using WonderDevBlogMVC2024.Enums;
 
 namespace WonderDevBlogMVC2024.Models
 {
-    //NOTE: Validation annotation is handled in BlogValidator.cs
-    //Display annotations are handled on the model
+    
     public class Comment
     {
         public int Id { get; set; }
         public string? AuthorId { get; set; }
         public int PostId {  get; set; }
         public string? ModeratorId { get; set; }
+        public string? CommentorId { get; set; }
 
         [Display(Name ="Comment")]
         public string? Body {  get; set; }
@@ -40,6 +40,8 @@ namespace WonderDevBlogMVC2024.Models
         public virtual Post? Post { get; set; }
 
         public virtual ApplicationUser? Author { get; set; }
+
+        public virtual ApplicationUser? Commentor { get; set; }
         public virtual ApplicationUser? Moderator { get; set; }
 
         

@@ -20,6 +20,7 @@ namespace WonderDevBlogMVC2024.Data
 
         [Display(Name = "User Profile Image")]
         public byte[]? ImageData { get; set; }
+
         public ImageType ImageType { get; set; }
 
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
@@ -42,6 +43,10 @@ namespace WonderDevBlogMVC2024.Data
 
             }
         }
+        // This will be used to upload the file from the form.
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
+
 
         //Navigation Properties
         public virtual ICollection<Blog> Blogs { get; set; } = [];

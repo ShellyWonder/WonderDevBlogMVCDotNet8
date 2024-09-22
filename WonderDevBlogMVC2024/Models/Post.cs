@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
 
@@ -8,12 +9,19 @@ namespace WonderDevBlogMVC2024.Models
     public class Post
     {
         public int Id { get; set; }
+        
         public int BlogId { get; set; }
         public string? AuthorId {  get; set; }
-        public string? Title { get; set; }
 
-        public string? Abstract { get; set; }
-        public string? Content { get; set; }
+        [Display(Name = "Post Title")]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
+        public required string? Title { get; set; }
+
+        [StringLength(1000, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
+        public required string? Abstract { get; set; }
+
+       [Display(Name ="Post Body")]
+       public required string? Content { get; set; }   
 
         public string? Slug {  get; set; }
 
@@ -30,6 +38,11 @@ namespace WonderDevBlogMVC2024.Models
 
         [Display(Name = "Select Image Type")]
         public ImageType ImageType { get; set; }
+
+        // This will be used to upload the file from the form.
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
+
 
         //Navigation Properties
 
