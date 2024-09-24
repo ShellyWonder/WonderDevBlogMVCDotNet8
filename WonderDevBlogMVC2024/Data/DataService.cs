@@ -35,6 +35,8 @@ namespace WonderDevBlogMVC2024.Data
                 FirstName = "Shelly",
                 LastName = "Wonder",
                 PhoneNumber = "4025555555",
+                GitHubUrl = "https://github.com/ShellyWonder",
+                LinkdInUrl = "https://linkedIn.com/ShellyWonder",
                 EmailConfirmed = true
             };
             ApplicationUser modUser = new()
@@ -44,6 +46,8 @@ namespace WonderDevBlogMVC2024.Data
                 FirstName = "Shelly",
                 LastName = "Wonder",
                 PhoneNumber = "4025555555",
+                GitHubUrl = "https://github.com/ShellyWonder",
+                LinkdInUrl = "https://linkedIn.com/ShellyWonder",
                 EmailConfirmed = true
             };
             ApplicationUser author = new()
@@ -53,6 +57,8 @@ namespace WonderDevBlogMVC2024.Data
                 FirstName = "Shelly",
                 LastName = "Wonder",
                 PhoneNumber = "4025555555",
+                GitHubUrl = "https://github.com/ShellyWonder",
+                LinkdInUrl = "https://linkedIn.com/ShellyWonder",
                 EmailConfirmed = true
             };
             ApplicationUser commentor = new()
@@ -62,6 +68,8 @@ namespace WonderDevBlogMVC2024.Data
                 FirstName = "Shelly",
                 LastName = "Wonder",
                 PhoneNumber = "4025555555",
+                GitHubUrl = "https://github.com/ShellyWonder",
+                LinkdInUrl = "https://linkedIn.com/ShellyWonder",
                 EmailConfirmed = true
             };
             try
