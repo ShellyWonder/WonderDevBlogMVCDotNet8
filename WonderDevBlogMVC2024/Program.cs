@@ -43,6 +43,8 @@ builder.Services.AddScoped<DataService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IBlogEmailSender, EmailService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ISlugRepository, SlugRepository>();
+builder.Services.AddScoped<ISlugService, SlugService>();
 
 //configuring max file sizes in form uploads
 builder.Services.Configure<FormOptions>(options =>
