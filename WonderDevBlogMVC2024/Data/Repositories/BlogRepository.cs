@@ -7,9 +7,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
     public class BlogRepository(ApplicationDbContext context) : IBlogRepository
     {
         private readonly ApplicationDbContext _context = context;
-        
-
-
+       
         public async Task<bool> BlogExistsAsync(int id)
         {
             return await _context.Blogs.AnyAsync(e => e.Id == id);
@@ -20,6 +18,12 @@ namespace WonderDevBlogMVC2024.Data.Repositories
             blog.Created = DateTime.Now;
             blog.AuthorId = userId;
             await _context.Blogs.AddAsync(blog);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateBlogAsync(Blog blog, string userId)
+        {
+            blog.Updated = DateTime.Now;    
+            _context.Blogs.Update(blog);
             await _context.SaveChangesAsync();
         }
 
@@ -45,10 +49,6 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                          FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task UpdateBlogAsync(Blog blog, string userId)
-        {
-            _context.Blogs.Update(blog);
-            await _context.SaveChangesAsync();
-        }
+        
     }
 }

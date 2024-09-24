@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting;
-using System.Reflection.Metadata;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class BlogsController(IBlogService blogService, UserManager<ApplicationUser> userManager, IImageService imageService) : Controller
+    public class BlogsController(IBlogService blogService, 
+                 UserManager<ApplicationUser> userManager, 
+                 IImageService imageService) : Controller
     {
         private readonly IBlogService _blogService = blogService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
