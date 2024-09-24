@@ -3,6 +3,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -10,21 +11,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Services.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
 {
-    public class IndexModel : PageModel
+    public class IndexModel(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IImageService imageService) : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-
-        public IndexModel(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IImageService _imageService = imageService;
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -59,6 +58,23 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+            public IFormFile ImageFile { get; set; }
+
+            [Display(Name = "Profile Image")]
+            public string ProfileImageUrl { get; set; }
+
+            [Display(Name = "GitHub Url")]
+            public string GitHubUrl { get; set; }
+
+            [Display(Name = "LinkedIn Url")]
+            public string LinkdInUrl { get; set; }
+
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -70,7 +86,13 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                ProfileImageUrl = _imageService.DecodeImage(user.ImageData, user.ImageType),
+                GitHubUrl = user.GitHubUrl,
+                LinkdInUrl = user.LinkdInUrl
+
             };
         }
 
@@ -81,7 +103,7 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
+            
             await LoadAsync(user);
             return Page();
         }
@@ -97,6 +119,7 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
+
                 return Page();
             }
 
@@ -109,8 +132,37 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+
+            }
+            //Update First and Last Name
+            if (Input.FirstName != user.FirstName || Input.LastName != user.LastName)
+            {
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
             }
 
+            // Process Image Update
+            if (Input.ImageFile != null)
+            {
+                // If the user uploads a new image, process it
+                user.ImageData = await _imageService.ConvertFileToByteArrayAsync(Input.ImageFile);
+                user.ImageType = _imageService.GetFileType(Input.ImageFile);
+            }
+
+            // Update GitHub and LinkedIn URLs
+            if (Input.GitHubUrl != user.GitHubUrl || Input.LinkdInUrl != user.LinkdInUrl)
+            {
+                user.GitHubUrl = Input.GitHubUrl;
+                user.LinkdInUrl = Input.LinkdInUrl;
+            }
+
+            // Save changes to the user
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                StatusMessage = "Unexpected error when updating your profile.";
+                return RedirectToPage();
+            }
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
