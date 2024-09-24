@@ -15,7 +15,7 @@ namespace WonderDevBlogMVC2024.Models
 
         [Display(Name = "Post Title")]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
-        public required string? Title { get; set; }
+        public required string Title { get; set; }
 
         [StringLength(1000, ErrorMessage = "The {0} must be at least {2} and no more than {1}", MinimumLength = 2)]
         public required string? Abstract { get; set; }

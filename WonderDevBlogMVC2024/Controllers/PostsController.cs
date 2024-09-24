@@ -12,13 +12,15 @@ namespace WonderDevBlogMVC2024.Controllers
     public class PostsController(IPostService postService, IBlogService blogService, 
                                  IApplicationUserService applicationUserService, 
                                  IImageService imageService,
-                                 UserManager<ApplicationUser> userManager) : Controller
+                                 UserManager<ApplicationUser> userManager,
+                                 ISlugService slugService) : Controller
     {
         private readonly IPostService _postService = postService;
         private readonly IBlogService _blogService = blogService;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
         private readonly IImageService _imageService = imageService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ISlugService _slugService = slugService;
 
 
         // GET: Posts
@@ -58,12 +60,22 @@ namespace WonderDevBlogMVC2024.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post)
+        public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post,List<string>tagValues)
         {
             if (ModelState.IsValid)
             {
                 // Get the current user ID
                 var userId = _userManager.GetUserId(User);
+                var slug = _slugService.UrlFriendly(post.Title);
+                if (!_slugService.IsUnique(slug))
+                {
+                    ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
+                    ViewData["tagValues"] = string.Join(", ", tagValues);
+                    return View(post);
+                }
+
+                    post.Slug = slug;
+ 
                 // Convert the uploaded image to a byte array and store it in database
                 await ImageImplementation(post);
                 // Pass userId to the service/repository
