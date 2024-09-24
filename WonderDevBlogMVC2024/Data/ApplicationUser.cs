@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WonderDevBlogMVC2024.Models;
-using WonderDevBlogMVC2024.Enums;
 
 namespace WonderDevBlogMVC2024.Data
 {

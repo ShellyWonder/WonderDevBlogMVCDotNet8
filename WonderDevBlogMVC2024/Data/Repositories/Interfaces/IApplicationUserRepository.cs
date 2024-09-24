@@ -8,6 +8,6 @@
         //Task<ApplicationUser> GetAuthorById(string id);
         //Task<IEnumerable<ApplicationUser>> GetAllModerators();
         //Task<ApplicationUser> GetModeratorById(string id);
-        Task<ApplicationUser?> UpdateUserAsync(ApplicationUser updatedUser);
+        
     }
 }

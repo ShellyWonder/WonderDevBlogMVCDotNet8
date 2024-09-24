@@ -32,26 +32,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
             return user;
         }
 
-        public  async Task<ApplicationUser?>UpdateUserAsync(ApplicationUser updatedUser)
-        {
-            var existingUser = await _context.Users
-                                         .FindAsync(updatedUser.Id);
-
-            if (existingUser == null)
-            {
-                throw new KeyNotFoundException($"User with ID {updatedUser.Id} was not found.");
-            }
-            existingUser.UserName = updatedUser.UserName;
-            existingUser.Email = updatedUser.Email;
-            existingUser.ImageData = updatedUser.ImageData;
-            existingUser.ImageType = updatedUser.ImageType;
-            // Update other properties as needed
-
-            // Save changes to the database
-            await _context.SaveChangesAsync();
-
-            return existingUser;
-        }
+       
     }
     
 }
