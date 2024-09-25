@@ -50,6 +50,10 @@
         <section>
             <h3>Use another service to log in.</h3>
             <hr />
+            <div>
+                <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="Google">Login with Google</a>
+                <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="GitHub">Login with GitHub</a>
+            </div>
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
                 {
