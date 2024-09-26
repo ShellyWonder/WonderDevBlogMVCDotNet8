@@ -2,22 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Services;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
 {
@@ -28,7 +25,7 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
-        private readonly IEmailSender _emailSender;
+        private readonly IBlogEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
@@ -36,7 +33,7 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IBlogEmailSender emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;

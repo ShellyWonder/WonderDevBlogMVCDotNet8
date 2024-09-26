@@ -58,8 +58,9 @@ namespace WonderDevBlogMVC2024.Controllers
                     await _userManager.AddLoginAsync(user, info);
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToLocal(returnUrl!);
+                    //add alert to let user know he/she is registered
                 }
-                return View("Login");
+                 return RedirectToPage("/Account/Login");
             }
         }
         private IActionResult RedirectToLocal(string returnUrl)

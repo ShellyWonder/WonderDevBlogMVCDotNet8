@@ -2,31 +2,23 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
 {
-    public class ForgotPasswordModel : PageModel
+    public class ForgotPasswordModel(UserManager<ApplicationUser> userManager, IBlogEmailSender emailSender) : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
-
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
-        {
-            _userManager = userManager;
-            _emailSender = emailSender;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IBlogEmailSender _emailSender = emailSender;
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

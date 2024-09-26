@@ -65,7 +65,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<DataService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-builder.Services.AddScoped<IBlogEmailSender, EmailService>();
+builder.Services.AddScoped<IBlogEmailSender, EmailSender>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ISlugRepository, SlugRepository>();
 builder.Services.AddScoped<ISlugService, SlugService>();

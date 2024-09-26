@@ -8,7 +8,7 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
-    public class EmailService(IOptions<MailSettings> mailSettings) : IBlogEmailSender
+    public class EmailSender(IOptions<MailSettings> mailSettings) : IBlogEmailSender
     {
        private readonly MailSettings _mailSettings = mailSettings.Value;
 
