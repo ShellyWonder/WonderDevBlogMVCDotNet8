@@ -8,6 +8,7 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 using WonderDevBlogMVC2024.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.Google;
+using AspNet.Security.OAuth.GitHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +30,9 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     // Ensure the default challenge scheme is set
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; 
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
-    .AddGoogle(googleOptions =>
+    .AddGoogle(GoogleDefaults.AuthenticationScheme,googleOptions =>
     {
         var ClientId = builder.Configuration["Authentication:Google:ClientId"];
         var ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
@@ -43,7 +44,21 @@ builder.Services.AddAuthentication(options =>
 
         googleOptions.ClientId = ClientId;
         googleOptions.ClientSecret = ClientSecret;
+    })
+    .AddGitHub(githubOptions =>
+    {
+        var ClientId = builder.Configuration["Authentication:GitHub:ClientId"];
+        var ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"];
+
+        if (string.IsNullOrEmpty(ClientId) || string.IsNullOrEmpty(ClientSecret))
+        {
+            throw new Exception("GitHub ClientId or ClientSecret is not set in the configuration.");
+        }
+
+        githubOptions.ClientId = ClientId;
+        githubOptions.ClientSecret = ClientSecret;
     });
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 //Add Razor components to enhance reusability
