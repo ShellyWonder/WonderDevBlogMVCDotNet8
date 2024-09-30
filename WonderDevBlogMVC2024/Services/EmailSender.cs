@@ -36,8 +36,10 @@ namespace WonderDevBlogMVC2024.Services
 
         public  async Task SendEmailAsync(string emailTo, string subject, string htmlMessage)
         {
-            var email = new MimeMessage();
-            email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            var email = new MimeMessage
+            {
+                Sender = MailboxAddress.Parse(_mailSettings.Mail)
+            };
             email.To.Add(MailboxAddress.Parse(emailTo));
             email.Subject = subject;
 

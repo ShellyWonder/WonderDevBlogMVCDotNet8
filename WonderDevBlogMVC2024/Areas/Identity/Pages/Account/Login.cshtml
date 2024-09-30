@@ -51,8 +51,9 @@
             <h3>Use another service to log in.</h3>
             <hr />
             <div>
-                <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="Google">Login with Google</a>
-                <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="GitHub">Login with GitHub</a>
+                @* <a class="btn btn-warning" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="Google">Login with Google</a> *@
+              @*   pending implementation *@
+                @* <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="GitHub">Login with GitHub</a> *@
             </div>
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
@@ -71,7 +72,7 @@
                             <p>
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account"> Continue with @provider.DisplayName</button>
                                 }
                             </p>
                         </div>
