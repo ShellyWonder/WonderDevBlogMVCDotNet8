@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -58,9 +59,11 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 // Get the current user ID
                 var userId = _userManager.GetUserId(User);
-                // Convert the uploaded image to a byte array and store it in database
-                await ImageImplementation(blog);
-                // Pass userId to the service/repository
+
+                // Convert the uploaded image to a byte array and the image data
+                blog = await ImageImplementation(blog);
+
+                // Pass  blog and userId to the service/repository
                 await _blogService.CreateBlogAsync(blog,userId!);
                 return RedirectToAction(nameof(Index));
             }
@@ -88,7 +91,7 @@ namespace WonderDevBlogMVC2024.Controllers
         // POST: Blogs/Edit/5
        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageFile")] Blog blog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Blog blog, IFormFile newImage)
         {
             if (id != blog.Id)
             {
@@ -97,17 +100,32 @@ namespace WonderDevBlogMVC2024.Controllers
 
             if (ModelState.IsValid)
             {
+
                 // Get the current user ID
                 var userId = _userManager.GetUserId(User);
-                // Check if a new image has been uploaded
-                if (blog.ImageFile != null)
-                {
-                    // Convert the uploaded image to a byte array and store it in the database
-                    await ImageImplementation(blog);
-                }
-                // Pass userId to the service/repository to update the rest of the blog
-                await _blogService.UpdateBlogAsync(blog, userId!);
-                return RedirectToAction(nameof(Index));
+
+                    // Get the current blog ID
+                    var newBlog = await _blogService.GetBlogByIdAsync(blog.Id);
+
+                    if (newBlog!.Name != blog.Name) newBlog.Name = blog.Name;
+
+                     if (newBlog!.Description != blog.Description) newBlog.Description = blog.Description;
+
+                     if (newBlog!.Name != blog.Name) newBlog.Name = blog.Name;
+                    
+
+                    // Check if a new image has been uploaded
+                    if (newImage != null)
+                    {
+                        // Assign the new image to the ImageFile property of the Blog object
+                        newBlog.ImageFile = newImage;
+                        // Convert the uploaded image to a byte array and store it in the database
+                         await ImageImplementation(newBlog);
+                    }
+                    // Pass userId to the service/repository to update the rest of the blog
+                    await _blogService.UpdateBlogAsync(blog, userId!);
+                    return RedirectToAction(nameof(Index));
+               
             }
             return View(blog);
         }
@@ -147,10 +165,10 @@ namespace WonderDevBlogMVC2024.Controllers
             var authors = await _blogService.GetAllAuthorsAsync();
             ViewData["AuthorId"] = new SelectList(authors, "Id", "FullName", selectedAuthor);
         }
-        private async Task ImageImplementation(Blog blog)
+        private async Task<Blog> ImageImplementation(Blog blog)
         {
             if (blog.ImageFile != null)
-            {
+            {    //Convert incoming file into a byte array
                 blog.Image = await _imageService.ConvertFileToByteArrayAsync(blog.ImageFile);
                 blog.ImageType = blog.ImageFile.ContentType;
             }
@@ -161,6 +179,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 blog.Image = await System.IO.File.ReadAllBytesAsync(defaultImagePath);
                 blog.ImageType = "image/png";  
             }
+            return blog;
         }
     }
 }
