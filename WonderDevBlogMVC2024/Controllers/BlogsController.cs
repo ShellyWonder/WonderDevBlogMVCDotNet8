@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
+using WonderDevBlogMVC2024.Areas.Identity.Pages;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class BlogsController(IBlogService blogService, 
-                 UserManager<ApplicationUser> userManager, 
+    public class BlogsController(IBlogService blogService,
+                 UserManager<ApplicationUser> userManager,
                  IImageService imageService) : Controller
     {
         private readonly IBlogService _blogService = blogService;
@@ -46,7 +47,7 @@ namespace WonderDevBlogMVC2024.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            
+
             return View();
         }
 
@@ -61,10 +62,10 @@ namespace WonderDevBlogMVC2024.Controllers
                 var userId = _userManager.GetUserId(User);
 
                 // Convert the uploaded image to a byte array and the image data
-                blog = await ImageImplementation(blog);
+                blog = await ImageImplementationAsync(blog);
 
                 // Pass  blog and userId to the service/repository
-                await _blogService.CreateBlogAsync(blog,userId!);
+                await _blogService.CreateBlogAsync(blog, userId!);
                 return RedirectToAction(nameof(Index));
             }
             return View(blog);
@@ -89,30 +90,32 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // POST: Blogs/Edit/5
-       [HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Blog blog, IFormFile newImage)
         {
             if (id != blog.Id)
             {
-                return NotFound();
+                return HandleError($"Blog with ID {blog.Id} was not found.");
             }
 
             if (ModelState.IsValid)
             {
 
-                // Get the current user ID
-                var userId = _userManager.GetUserId(User);
+                try
+                {
+                    // Get the current user ID
+                    var userId = _userManager.GetUserId(User);
 
                     // Get the current blog ID
                     var newBlog = await _blogService.GetBlogByIdAsync(blog.Id);
 
                     if (newBlog!.Name != blog.Name) newBlog.Name = blog.Name;
 
-                     if (newBlog!.Description != blog.Description) newBlog.Description = blog.Description;
+                    if (newBlog!.Description != blog.Description) newBlog.Description = blog.Description;
 
-                     if (newBlog!.Name != blog.Name) newBlog.Name = blog.Name;
-                    
+                    if (newBlog!.Name != blog.Name) newBlog.Name = blog.Name;
+
 
                     // Check if a new image has been uploaded
                     if (newImage != null)
@@ -120,12 +123,18 @@ namespace WonderDevBlogMVC2024.Controllers
                         // Assign the new image to the ImageFile property of the Blog object
                         newBlog.ImageFile = newImage;
                         // Convert the uploaded image to a byte array and store it in the database
-                         await ImageImplementation(newBlog);
+                        blog = await ImageImplementationAsync(newBlog);
                     }
                     // Pass userId to the service/repository to update the rest of the blog
                     await _blogService.UpdateBlogAsync(blog, userId!);
                     return RedirectToAction(nameof(Index));
-               
+                }
+                catch (KeyNotFoundException)
+                {
+
+                    return HandleError($"Blog with ID {blog.Id} was not found.");
+                }
+
             }
             return View(blog);
         }
@@ -134,13 +143,13 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return HandleError($"Blog with ID {id} was not found.");
             }
 
             var blog = await _blogService.GetBlogByIdAsync(id.Value);
             if (blog == null)
             {
-                return NotFound();
+                return HandleError($"Blog with ID {id} was not found.");
             }
 
             return View(blog);
@@ -165,7 +174,7 @@ namespace WonderDevBlogMVC2024.Controllers
             var authors = await _blogService.GetAllAuthorsAsync();
             ViewData["AuthorId"] = new SelectList(authors, "Id", "FullName", selectedAuthor);
         }
-        private async Task<Blog> ImageImplementation(Blog blog)
+        private async Task<Blog> ImageImplementationAsync(Blog blog)
         {
             if (blog.ImageFile != null)
             {    //Convert incoming file into a byte array
@@ -177,9 +186,19 @@ namespace WonderDevBlogMVC2024.Controllers
                 // Assign default image if no image is uploaded
                 var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "default_icon.png");
                 blog.Image = await System.IO.File.ReadAllBytesAsync(defaultImagePath);
-                blog.ImageType = "image/png";  
+                blog.ImageType = "image/png";
             }
             return blog;
+        }
+
+        private ViewResult HandleError(string errorMessage)
+        {
+            var errorModel = new ErrorModel
+            {
+                CustomErrorMessage = errorMessage
+            };
+            // Return the error view with the message
+            return View("Error", errorModel);
         }
     }
 }
