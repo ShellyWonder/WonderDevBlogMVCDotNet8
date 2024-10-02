@@ -18,7 +18,6 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         public async Task UpdatePostAsync(Post post, string userId)
         {
             post.Updated = DateTime.Now;
-            _context.Posts.Update(post);
             await _context.SaveChangesAsync();
         }
         public async Task DeletePostAsync(int id)
@@ -42,10 +41,8 @@ namespace WonderDevBlogMVC2024.Data.Repositories
 
         public async Task<Post> GetPostByIdAsync(int id)
         {
-            var post = await _context.Posts
-                .Include(p => p.Author)
-                .Include(p => p.Blog)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var post = await _context.Posts.FindAsync(id);
+
             if (post == null)
             {
                 throw new KeyNotFoundException($"Post with id {id} not found.");

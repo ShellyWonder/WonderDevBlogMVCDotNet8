@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using System.Reflection.Metadata;
+using WonderDevBlogMVC2024.Areas.Identity.Pages;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
@@ -62,30 +64,40 @@ namespace WonderDevBlogMVC2024.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post,List<string>tagValues)
         {
-            if (ModelState.IsValid)
-            {
-                // Get the current user ID
-                var userId = _userManager.GetUserId(User);
-                var slug = _slugService.UrlFriendly(post.Title);
-                if (!_slugService.IsUnique(slug))
+                if (!ModelState.IsValid)
                 {
-                    ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
+                    await PopulateViewDataAsync(post);
                     ViewData["tagValues"] = string.Join(", ", tagValues);
                     return View(post);
                 }
+                try
+                {
+                    // Get the current user ID
+                    var userId = _userManager.GetUserId(User);
+                    var slug = _slugService.UrlFriendly(post.Title);
+                    if (!_slugService.IsUnique(slug))
+                    {
+                        ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
+                        ViewData["tagValues"] = string.Join(", ", tagValues);
+                        return View(post);
+                    }
 
                     post.Slug = slug;
- 
-                // Convert the uploaded image to a byte array and store it in database
-                await ImageImplementation(post);
-                // Pass userId to the service/repository
-                await _postService.AddPostAsync(post,userId!);
-                return RedirectToAction(nameof(Index));
-            }
-            await PopulateViewDataAsync(post);
-            return View(post);
-        }
 
+                    // Convert the uploaded image to a byte array and store it in database
+                    post = await ImageImplementationAsync(post);
+                    // Pass userId to the service/repository
+                    await _postService.AddPostAsync(post, userId!);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+
+                    // Log the error if needed and return a custom error message
+                    return HandleError($"An error occurred while creating the post: {ex.Message}");
+                }
+        }
+            
         // GET: Posts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -97,7 +109,7 @@ namespace WonderDevBlogMVC2024.Controllers
             var post = await _postService.GetPostByIdAsync(id.Value);
             if (post == null)
             {
-                return NotFound();
+                return HandleError($"Post with ID {id} was not found.");
             }
 
             await PopulateViewDataAsync(post);
@@ -108,27 +120,43 @@ namespace WonderDevBlogMVC2024.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState")] Post post, IFormFile newImage)
         {
             if (id != post.Id)
             {
-                return NotFound();
+                return HandleError($"Post with ID {post.Id} was not found.");
             }
 
             if (ModelState.IsValid)
             {
-                // Get the current user ID
-                var userId = _userManager.GetUserId(User);
-
-                // Check if a new image has been uploaded
-                if (post.ImageFile != null)
+                try
                 {
-                    // Convert the uploaded image to a byte array and store it in the database
-                    await ImageImplementation(post);
+                    // Get the current user ID
+                    var userId = _userManager.GetUserId(User);
+                    // Get the current blog ID
+                    var newPost = await _postService.GetPostByIdAsync(post.Id);
+
+                    if (newPost.Title != newPost.Title) newPost.Title = post.Title;
+                    if (newPost.Abstract != newPost.Abstract) newPost.Abstract = post.Abstract;
+                    if (newPost.Content != newPost.Content) newPost.Content = post.Content;
+                    if (newPost.BlogPostState != newPost.BlogPostState) newPost.BlogPostState = post.BlogPostState;
+
+                    // Check if a new image has been uploaded
+                    if (newImage != null)
+                    {
+                        // Assign the new image to the ImageFile property of the Blog object
+                        newPost.ImageFile = newImage;
+                        // Convert the uploaded image to a byte array and store it in the database
+                        newPost = await ImageImplementationAsync(newPost);
+                    }
+                    // Pass userId to the service/repository,updating the rest of the post
+                    await _postService.UpdatePostAsync(post, userId!);
+                    return RedirectToAction(nameof(Index));
                 }
-                // Pass userId to the service/repository,updating the rest of the post
-                await _postService.UpdatePostAsync(post, userId!);
-                return RedirectToAction(nameof(Index));
+                catch (KeyNotFoundException)
+                {
+                    return HandleError($"Post with ID {post.Id} was not found.");
+                }
             }
             await PopulateViewDataAsync(post);
             return View(post);
@@ -179,7 +207,7 @@ namespace WonderDevBlogMVC2024.Controllers
 
             }
         }
-        private async Task ImageImplementation(Post post)
+        private async Task<Post> ImageImplementationAsync(Post post)
         {
             if (post.ImageFile != null)
             {
@@ -193,6 +221,17 @@ namespace WonderDevBlogMVC2024.Controllers
                 post.ImageData = await System.IO.File.ReadAllBytesAsync(defaultImagePath);
                 post.ImageType = "image/png";
             }
+            return post;
+        }
+
+        private IActionResult HandleError(string errorMessage)
+        {
+            var errorModel = new ErrorModel
+            {
+                CustomErrorMessage = errorMessage
+            };
+            // Return the error view with the message
+            return View("Error", errorModel); 
         }
     }
 }
