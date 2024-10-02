@@ -169,7 +169,7 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
                 else
                 {
                     // If no image is provided, use the default image "img/avatar_icon.png"
-                    user.ImageData = await _imageService.ConvertFileToByteArrayAsync("avatar_icon.png");
+                    user.ImageData = await _imageService.ConvertFileToByteArrayAsync("/img/avatar_icon.png");
                     user.ImageType = "png"; // Set the file type of the default image
                 }
 

@@ -51,9 +51,7 @@
             <h3>Use another service to log in.</h3>
             <hr />
             <div>
-                @* <a class="btn btn-warning" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="Google">Login with Google</a> *@
-              @*   pending implementation *@
-                @* <a class="btn btn-primary" asp-area="" asp-controller="ExternalLogin" asp-action="Challenge" asp-route-provider="GitHub">Login with GitHub</a> *@
+              
             </div>
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
@@ -73,6 +71,23 @@
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
                                     <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account"> Continue with @provider.DisplayName</button>
+                                    //CONTINUE WITH GOOGLE BUTTON--CODE WHEN READY TO IMPLEMENT
+                                    // <div id="g_id_onload"
+                                    //      data-client_id="137532099882-64434orm4mhetl4frkctrt5k0c9gt4h0.apps.googleusercontent.com"
+                                    //      data-context="signin"
+                                    //      data-ux_mode="popup"
+                                    //      data-login_uri="https://localhost:7251/Identity/Account/Login"
+                                    //      data-auto_prompt="false">
+                                    // </div>
+
+                                    // <div class="g_id_signin"
+                                    //      data-type="standard"
+                                    //      data-shape="pill"
+                                    //      data-theme="outline"
+                                    //      data-text="signin_with"
+                                    //      data-size="large"
+                                    //      data-logo_alignment="left">
+                                    // </div>
                                 }
                             </p>
                         </div>
