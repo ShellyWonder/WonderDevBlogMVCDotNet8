@@ -1,4 +1,6 @@
-﻿@model IEnumerable<WonderDevBlogMVC2024.Models.Post>
+﻿@using WonderDevBlogMVC2024.Services.Interfaces
+@inject IImageService imageService
+@model IEnumerable<WonderDevBlogMVC2024.Models.Post>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,6 +14,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageFile)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
@@ -42,6 +47,16 @@
             </td>
            <td>
                 @Html.DisplayFor(modelItem => item.Created)
+            </td>
+            <td>
+                    @if (item.ImageData != null)
+                    {
+                        <img src="@imageService.DecodeImage(item.ImageData, item.ImageType!)" class="img-fluid" alt="@(item.Title) Blog Image" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <img src="~/img/default_icon.png class="img-fluid" alt="Default Blog Image" style="max-width: 200px;" />
+                    }
             </td>
            
             <td>

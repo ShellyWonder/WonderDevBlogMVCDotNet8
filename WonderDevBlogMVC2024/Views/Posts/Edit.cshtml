@@ -40,10 +40,10 @@
                 <span asp-validation-for="BlogPostState" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
+                <label asp-for="ImageFile" class="control-label"></label>
                 @* deriving from deprecated IFormFile. Modify when creating form component *@
-                <input file="file" asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
+                <input type="file" name="NewImage" class="form-control" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             
             <div class="form-group">
@@ -60,3 +60,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<!--add quill editor component in content area when ready to implement-->

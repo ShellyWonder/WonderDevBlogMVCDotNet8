@@ -25,10 +25,10 @@
             </div>
            
             <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
+                <label asp-for="Image" class="control-label"></label>
                @*  change "ImageData" when component is created *@
-                <input type="file" asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
+                <input type="file" name="NewImage" class="form-control" accept=".jpg, .png, .gif, .jpeg" />
+                <span asp-validation-for="Image" class="text-danger"></span>
             </div>
             
             <div class="form-group">
@@ -45,3 +45,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<!--add quill editor component in content area when ready to implement-->

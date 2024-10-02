@@ -1,4 +1,6 @@
-﻿@model IEnumerable<WonderDevBlogMVC2024.Models.Blog>
+﻿@using WonderDevBlogMVC2024.Services.Interfaces
+@inject IImageService imageService
+@model IEnumerable<WonderDevBlogMVC2024.Models.Blog>
 
 @{
     ViewData["Title"] = "Index";
@@ -25,14 +27,11 @@
                 @Html.DisplayNameFor(model => model.Updated)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageData)
+               
+                @Html.DisplayNameFor(model => model.Image)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
+            
+            
             <th></th>
         </tr>
     </thead>
@@ -52,14 +51,16 @@
                 @Html.DisplayFor(modelItem => item.Updated)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ImageData)
+                    @if (item.Image != null)
+                    {
+                        <img src="@imageService.DecodeImage(item.Image, item.ImageType!)" class="img-fluid" alt="@(item.Name) Blog Image" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <img src="~/img/default_icon.png alt="Default Blog Image" class="img-fluid" style="max-width: 200px;" />
+                    }
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AuthorId)
-            </td>
+            
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
