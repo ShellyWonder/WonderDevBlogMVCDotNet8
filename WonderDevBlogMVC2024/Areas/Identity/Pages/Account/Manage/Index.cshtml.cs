@@ -1,6 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -150,12 +148,9 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account.Manage
             }
 
             // Update GitHub and LinkedIn URLs
-            if (Input.GitHubUrl != user.GitHubUrl || Input.LinkdInUrl != user.LinkdInUrl)
-            {
-                user.GitHubUrl = Input.GitHubUrl;
-                user.LinkdInUrl = Input.LinkdInUrl;
-            }
-
+            if (Input.GitHubUrl != user.GitHubUrl) user.GitHubUrl = Input.GitHubUrl;
+            if (Input.LinkdInUrl != user.LinkdInUrl) user.LinkdInUrl = Input.LinkdInUrl;
+            
             // Save changes to the user
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
