@@ -45,10 +45,31 @@ namespace WonderDevBlogMVC2024.Data.Repositories
 
             if (post == null)
             {
+
                 throw new KeyNotFoundException($"Post with id {id} not found.");
+
             }
 
             return post;
+
+        }
+
+        public async Task<Post> GetPostBySlugAsync(string slug)
+        {
+            var post = await _context.Posts
+                           .Include(p => p.Author)   // Eagerly load the author
+                           .Include(p => p.Blog)     // Eagerly load the blog (parent)
+                           .Include(p => p.Tags)     // Eagerly load the tags
+                           .FirstOrDefaultAsync(p => p.Slug == slug);
+
+            if (post == null)
+            {
+                throw new KeyNotFoundException($"Post with slug '{slug}' not found.");
+            }
+
+            return post;
+
+
         }
 
         public  async Task<bool> PostExistsAsync(int id)

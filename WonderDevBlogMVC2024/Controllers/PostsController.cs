@@ -33,14 +33,14 @@ namespace WonderDevBlogMVC2024.Controllers
         }
 
         // GET: Posts/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string slug)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(slug))
             {
                 return NotFound();
             }
 
-            var post = await _postService.GetPostByIdAsync(id.Value);
+            var post = await _postService.GetPostBySlugAsync(slug);
 
             if (post == null)
             {

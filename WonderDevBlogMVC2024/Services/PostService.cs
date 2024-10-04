@@ -33,6 +33,10 @@ namespace WonderDevBlogMVC2024.Services
         {
             return await _postRepository.GetPostByIdAsync(id);
         }
+        public async Task<Post> GetPostBySlugAsync(string slug)
+        {
+            return await _postRepository.GetPostBySlugAsync(slug);
+        }
 
         public  async Task<bool> PostExistsAsync(int id)
         {

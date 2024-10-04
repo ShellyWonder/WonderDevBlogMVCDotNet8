@@ -28,3 +28,8 @@ function DeleteTag() {
     }
 
 }
+
+//JQuery:"on submit" highlights all the created tags accompanying the post; passes the tags along the HTTP Post
+$("form").on("submit", function () {
+    $("#TagList option").prop("selected", "selected");
+})
