@@ -15,7 +15,7 @@ namespace WonderDevBlogMVC2024.Controllers
                                  IApplicationUserService applicationUserService, 
                                  IImageService imageService,
                                  UserManager<ApplicationUser> userManager,
-                                 ISlugService slugService) : Controller
+                                 ISlugService slugService, ITagService tagService) : Controller
     {
         private readonly IPostService _postService = postService;
         private readonly IBlogService _blogService = blogService;
@@ -23,7 +23,7 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly IImageService _imageService = imageService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ISlugService _slugService = slugService;
-
+        private readonly ITagService _tagService = tagService;
 
         // GET: Posts
         public async Task<IActionResult> Index()
@@ -72,9 +72,10 @@ namespace WonderDevBlogMVC2024.Controllers
                 }
                 try
                 {
-                    // Get the current user ID
-                    var userId = _userManager.GetUserId(User);
-                    var slug = _slugService.UrlFriendly(post.Title);
+                // Get the current user ID
+                var authorId = _userManager.GetUserId(User);
+                post.AuthorId = authorId;
+                var slug = _slugService.UrlFriendly(post.Title);
                     if (!_slugService.IsUnique(slug))
                     {
                         ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
@@ -86,14 +87,22 @@ namespace WonderDevBlogMVC2024.Controllers
 
                     // Convert the uploaded image to a byte array and store it in database
                     post = await ImageImplementationAsync(post);
-                    // Pass userId to the service/repository
-                    await _postService.AddPostAsync(post, userId!);
+
+                foreach (var tagText in tagValues)
+                {
+                    // Add each tag using the tag service/repository method
+                    await _tagService.AddTagAsync(tagText, post.Id, authorId!);
+                }
+
+
+                // Pass userId to the service/repository
+                await _postService.AddPostAsync(post, authorId!);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
 
-                    // Log the error if needed and return a custom error message
+                    //  if needed, return a custom error message
                     return HandleError($"An error occurred while creating the post: {ex.Message}");
                 }
         }

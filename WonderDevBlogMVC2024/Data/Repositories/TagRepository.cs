@@ -22,12 +22,28 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                                       .FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task AddTagAsync(Tag tag)
+        public async Task AddTagAsync(string tagText, int postId, string authorId)
         {
-            _context.Tags.Add(tag);
-            await _context.SaveChangesAsync();
+            // Check if the tag already exists in the database for the same post
+            var existingTag = await _context.Tags
+                                            .FirstOrDefaultAsync(t => t.Text == tagText && t.PostId == postId);
+
+            if (existingTag == null)
+            {
+                // If the tag doesn't exist, create a new one
+                var newTag = new Tag
+                {
+                    Text = tagText,
+                    PostId = postId,
+                    AuthorId = authorId // Associate the tag with the author (ApplicationUserId)
+                };
+
+                _context.Tags.Add(newTag);
+                await _context.SaveChangesAsync(); // Save the tag to the database
+            }
         }
-        public  async Task UpdateTagAsync(Tag tag)
+
+        public async Task UpdateTagAsync(Tag tag)
         {
             _context.Tags.Update(tag);
             await _context.SaveChangesAsync(); ;

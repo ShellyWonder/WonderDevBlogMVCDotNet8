@@ -6,7 +6,8 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
     {
         Task<IEnumerable<Tag>> GetAllTagsAsync();
         Task<Tag?> GetTagByIdAsync(int id);
-        Task AddTagAsync(Tag tag);
+        Task AddTagAsync(string tagText, int postId, string authorId);
+        
         Task UpdateTagAsync(Tag tag);
         Task DeleteTagAsync(int id);
         bool TagExists(int id);

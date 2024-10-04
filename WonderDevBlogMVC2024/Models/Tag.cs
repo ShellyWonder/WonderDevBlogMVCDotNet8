@@ -3,9 +3,7 @@
 
 namespace WonderDevBlogMVC2024.Models
 {
-    //NOTE: Validation annotation is handled in BlogValidator.cs
-    //Display annotations are handled on the model
-    public class Tag
+        public class Tag
     {
         public int Id { get; set; }
 

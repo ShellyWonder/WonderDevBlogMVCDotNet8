@@ -30,3 +30,6 @@ header, footer {
 h1, h2 {
     color: #2C3E50; /* Primary color text */
 }
+.option {
+    font-weight: bolder;
+}

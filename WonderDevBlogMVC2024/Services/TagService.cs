@@ -17,14 +17,17 @@ namespace WonderDevBlogMVC2024.Services
         {
             return await _tagRepository.GetTagByIdAsync(id);
         }
-        public async Task AddTagAsync(Tag tag)
+
+        public async Task AddTagAsync(string tagText, int postId, string authorId)
         {
-           await _tagRepository.AddTagAsync(tag);
+           await _tagRepository.AddTagAsync( tagText, postId,  authorId);
         }
+
         public async Task UpdateTagAsync(Tag tag)
         {
             await _tagRepository.UpdateTagAsync(tag);
         }
+
         public async Task DeleteTagAsync(int id)
         {
             await _tagRepository.DeleteTagAsync(id);
