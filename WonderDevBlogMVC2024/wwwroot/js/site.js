@@ -1,4 +1,12 @@
-﻿let index = 0;
+﻿
+//***TAG BUTTONS ***/
+let index = 0;
+
+document.querySelector("form").addEventListener("submit", function () {
+    const tagListOptions = document.querySelectorAll("#TagList option");
+    // Select all options before form submission & passes tags to the HTTP post
+    tagListOptions.forEach(option => option.selected = true); 
+});
 
 function AddTag() {
     var tagEntry = document.querySelector("#TagEntry");
@@ -12,24 +20,34 @@ function AddTag() {
     tagEntry.value = "";
 }
 function DeleteTag() {
-    let tagCount = 1;
-    while (tagCount > 0) {
-        let tagList = document.querySelector("#TagList");
-        let selectedIndex = tagList.selectedIndex;
+    let tagList = document.querySelector("#TagList");
+    let selectedIndex = tagList.selectedIndex;
 
-        if (selectedIndex >= 0) {
-            document.querySelector("#TagList").options[selectedIndex] = null;
-            --tagCount;
-        }
-        else {
-            tagCount = 0;
-            index--;
-        }
+    if (selectedIndex >= 0) {
+        // Removes the selected option
+        tagList.remove(selectedIndex); 
+        // Decrement index since an option was removed
+        index--;  
     }
+}
+
+//query tagValues variable for data
+if (tagValues != "") {
+    let tagArray = tagValues.split(",");
+    for (let loop = 0; loop < tagArray.length; loop++) {
+        ReplaceTag(tagArray[loop], loop);
+        index++;
+    }
+}
+
+function ReplaceTag(tag, index) {
+    let newOption = newOption(tag, tag);
+    document.querySelector("#TagList").options[index] = newOption;
 
 }
 
-//JQuery:"on submit" highlights all the created tags accompanying the post; passes the tags along the HTTP Post
-$("form").on("submit", function () {
-    $("#TagList option").prop("selected", "selected");
-})
+/**UPDATE FOOT COPYRIGHT YEAR*/
+document.addEventListener("DOMContentLoaded", function () {
+    const currentYear = new Date().getFullYear();
+    document.querySelector("#currentYear").textContent = currentYear;
+});

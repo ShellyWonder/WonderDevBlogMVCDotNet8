@@ -122,6 +122,7 @@ namespace WonderDevBlogMVC2024.Controllers
             }
 
             await PopulateViewDataAsync(post);
+            ViewData["TagValues"] = string.Join(",",post.Tags.Select(t => t.Text));
             return View(post);
         }
 

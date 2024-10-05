@@ -41,7 +41,10 @@ namespace WonderDevBlogMVC2024.Data.Repositories
 
         public async Task<Post> GetPostByIdAsync(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts
+                            .Include(p => p.Tags)
+                            .FirstOrDefaultAsync(p => p.Id == id);
+                            
 
             if (post == null)
             {
@@ -57,9 +60,12 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         public async Task<Post> GetPostBySlugAsync(string slug)
         {
             var post = await _context.Posts
-                           .Include(p => p.Author)   // Eagerly load the author
-                           .Include(p => p.Blog)     // Eagerly load the blog (parent)
-                           .Include(p => p.Tags)     // Eagerly load the tags
+                           // Eagerly load the author
+                           .Include(p => p.Author)
+                           // Eagerly load the blog (parent)
+                           .Include(p => p.Blog)
+                           // Eagerly load the tags
+                           .Include(p => p.Tags)     
                            .FirstOrDefaultAsync(p => p.Slug == slug);
 
             if (post == null)

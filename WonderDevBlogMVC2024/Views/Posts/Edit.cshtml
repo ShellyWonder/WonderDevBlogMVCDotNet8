@@ -10,7 +10,7 @@
 <h4>Post</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
@@ -35,15 +35,49 @@
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BlogPostState" class="control-label"></label>
-                <select asp-for="BlogPostState" class="form-control" asp-items="Html.GetEnumSelectList<PostState>()"></select>
-                <span asp-validation-for="BlogPostState" class="text-danger"></span>
+                <div class="row">
+                    <div class="col">
+                        <label class="control-label">Manage Tags</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control" id="TagEntry" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mt-3">
+                                <button type="button" onclick="AddTag()" class="btn btn-dark btn-sm btn-block">Add</button>
+                            </div>
+                            <div class="col mt-3">
+                                <button type="button" onclick="DeleteTag()" class="btn btn-dark btn-sm btn-block">Delete</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col">
+                        <!--btn block here allows for block space in an otherwise empty area-->
+                        <select name="TagVales" class="btn-block option" id="TagList" multiple></select>
+                    </div>
+                </div>
+
             </div>
+
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
                 @* deriving from deprecated IFormFile. Modify when creating form component *@
                 <input type="file" name="NewImage" class="form-control" />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="BlogPostState" class="control-label"></label>
+                <select asp-for="BlogPostState" class="form-control" asp-items="Html.GetEnumSelectList<PostState>()"></select>
+                <span asp-validation-for="BlogPostState" class="text-danger"></span>
             </div>
             
             <div class="form-group">
@@ -58,6 +92,12 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+
+        let tagValues = '@ViewData["tagValues"]';
+
+        //add quill editor component in content area when ready to implement
+
+    </script>
+   
 }
-<!--add quill editor component in content area when ready to implement-->
