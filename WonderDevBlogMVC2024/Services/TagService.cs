@@ -33,6 +33,11 @@ namespace WonderDevBlogMVC2024.Services
             await _tagRepository.DeleteTagAsync(id);
         }
 
+        // Removes all tags associated with a specific post
+        public async Task RemoveAllTagsByPostIdAsync(int postId)
+        {
+            await _tagRepository.RemoveAllTagsByPostIdAsync(postId);
+        }
         public bool TagExists(int id)
         {
             return _tagRepository.TagExists(id);

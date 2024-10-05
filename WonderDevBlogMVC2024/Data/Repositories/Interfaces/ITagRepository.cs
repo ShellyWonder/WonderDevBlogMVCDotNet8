@@ -10,6 +10,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories.Interfaces
 
         Task UpdateTagAsync(Tag tag);
         Task DeleteTagAsync(int id);
+        Task RemoveAllTagsByPostIdAsync(int postId);
         bool TagExists(int id);
     }
 }

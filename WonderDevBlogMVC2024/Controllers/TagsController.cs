@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services;
@@ -16,14 +17,14 @@ namespace WonderDevBlogMVC2024.Controllers
                                  IApplicationUserService applicationUserService,
                                   IPostService postService) : Controller
     {
-        private readonly ITagService _tagsService = tagsService;
+        private readonly ITagService _tagService = tagsService;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
         private readonly IPostService _postService = postService;
 
         // GET: Tags
         public async Task<IActionResult> Index()
         {
-            var tags = await _tagsService.GetAllTagsAsync();
+            var tags = await _tagService.GetAllTagsAsync();
             return View(tags);
         }
 
@@ -35,7 +36,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _tagsService.GetTagByIdAsync(id.Value);
+            var tag = await _tagService.GetTagByIdAsync(id.Value);
             if (tag == null)
             {
                 return NotFound();
@@ -54,11 +55,11 @@ namespace WonderDevBlogMVC2024.Controllers
         // POST: Tags/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PostId,AuthorId,Text")] Tag tag)
+        public async Task<IActionResult> Create([Bind("Id,PostId,AuthorId,TagText")] Tag tag)
         {
             if (ModelState.IsValid)
             {
-               await _tagsService.AddTagAsync(tag);
+               await _tagService.AddTagAsync(tag.Text!, tag.PostId, tag.AuthorId!);
                 return RedirectToAction(nameof(Index));
             }
             await PopulateDropDownLists();
@@ -73,7 +74,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _tagsService.GetTagByIdAsync(id.Value);
+            var tag = await _tagService.GetTagByIdAsync(id.Value);
 
             if (tag == null)
             {
@@ -98,7 +99,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 try
                 {
                    
-                    await _tagsService.UpdateTagAsync(tag);
+                    await _tagService.UpdateTagAsync(tag);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -125,7 +126,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 return NotFound();
             }
 
-            var tag = await _tagsService.GetTagByIdAsync(id.Value);
+            var tag = await _tagService.GetTagByIdAsync(id.Value);
             if (tag == null)
             {
                 return NotFound();
@@ -139,13 +140,13 @@ namespace WonderDevBlogMVC2024.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _tagsService.DeleteTagAsync(id);
+            await _tagService.DeleteTagAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool TagExists(int id)
         {
-            return _tagsService.TagExists(id);
+            return _tagService.TagExists(id);
         }
 
         private async Task PopulateDropDownLists(Tag? tag = null)

@@ -35,7 +35,8 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 {
                     Text = tagText,
                     PostId = postId,
-                    AuthorId = authorId // Associate the tag with the author (ApplicationUserId)
+                    // Associate the tag with the author (ApplicationUserId)
+                    AuthorId = authorId 
                 };
 
                 _context.Tags.Add(newTag);
@@ -59,7 +60,19 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-        
+
+        public async Task RemoveAllTagsByPostIdAsync(int postId)
+        {
+            var tagsToRemove = await _context.Tags
+                                             .Where(t => t.PostId == postId)
+                                             .ToListAsync();
+
+            if (tagsToRemove.Any())
+            {
+                _context.Tags.RemoveRange(tagsToRemove);
+                await _context.SaveChangesAsync();
+            }
+        }
         public bool TagExists(int id)
         {
             return _context.Tags.Any(t => t.Id == id);

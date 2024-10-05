@@ -130,7 +130,8 @@ namespace WonderDevBlogMVC2024.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState")] Post post, IFormFile newImage)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState")]
+                                              Post post, IFormFile newImage,List<string>tagValues)
         {
             if (id != post.Id)
             {
@@ -158,6 +159,16 @@ namespace WonderDevBlogMVC2024.Controllers
                         newPost.ImageFile = newImage;
                         // Convert the uploaded image to a byte array and store it in the database
                         newPost = await ImageImplementationAsync(newPost);
+
+                        //Remove all tags associated with the post
+                        await _tagService.RemoveAllTagsByPostIdAsync(post.Id);
+
+                        // Add the new tags to the post
+                        foreach (var tagText in tagValues)
+                        {
+                            await _tagService.AddTagAsync(tagText, post.Id, userId!);
+                        }
+
                     }
                     // Pass userId to the service/repository,updating the rest of the post
                     await _postService.UpdatePostAsync(post, userId!);
@@ -234,7 +245,7 @@ namespace WonderDevBlogMVC2024.Controllers
             return post;
         }
 
-        private IActionResult HandleError(string errorMessage)
+        private ViewResult HandleError(string errorMessage)
         {
             var errorModel = new ErrorModel
             {
