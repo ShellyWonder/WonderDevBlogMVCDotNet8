@@ -103,8 +103,8 @@ namespace WonderDevBlogMVC2024.Controllers
                     }
 
                     if (validationError) {
-                        ViewData["tagValues"] = string.Join(", ", tagValues);
-                        return View(post);
+                    PopulateTagValues(post);
+                    return View(post);
                     }
 
                     post.Slug = slug;//END SLUG CREATION AND VALIDATION
@@ -156,7 +156,7 @@ namespace WonderDevBlogMVC2024.Controllers
             }
 
             await PopulateViewDataAsync(post);
-            ViewData["TagValues"] = string.Join(",",post.Tags.Select(t => t.Text));
+            PopulateTagValues(post);
             return View(post);
         }
         #endregion
@@ -197,6 +197,8 @@ namespace WonderDevBlogMVC2024.Controllers
                     else
                     {
                         ModelState.AddModelError("Title", "This title is a duplicate of a previous post. Please choose another title");
+                        PopulateTagValues(post);
+                        return View(post);
                     }
                     #endregion
 
@@ -285,6 +287,14 @@ namespace WonderDevBlogMVC2024.Controllers
 
             }
         }
+        #endregion
+
+        #region POPULATE TAG VALUES
+        private void PopulateTagValues(Post post)
+        {
+            ViewData["TagValues"] = string.Join(",", post.Tags.Select(t => t.Text));
+        }
+
         #endregion
 
         #region IMAGE IMPLEMENTATION
