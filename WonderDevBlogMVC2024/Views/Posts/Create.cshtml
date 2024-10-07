@@ -88,6 +88,10 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   <script>
+       let tagValues = '@ViewData["TagValues"]';
+       </script>
+
+ <!--add quill editor component in content area when ready to implement-->
+<script src="~/js/site.js"></script>
 }
-<!--add quill editor component in content area when ready to implement-->

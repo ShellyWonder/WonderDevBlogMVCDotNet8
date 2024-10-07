@@ -10,17 +10,30 @@ document.querySelector("form").addEventListener("submit", function () {
 
 function AddTag() {
     var tagEntry = document.querySelector("#TagEntry");
+    //mechanism to detect an error state
+    let searchResult = Search(tagEntry.value);
 
+    if (searchResult != null) {
+        //trigger alert modal
+        swalWithDarkButton.fire({
+            html: `<span class="font-weight-bolder">${searchResult.toUpperCase()}</span>`
+        });
+    }
+    else {
     //Create new option for the select list
     //parameters populate both value and the text
     let newOption = new Option(tagEntry.value, tagEntry.value);
     document.querySelector("#TagList").options[index++] = newOption;
+    }
 
     //clear out the tagEntry control
     tagEntry.value = "";
+    return true;
 }
 function DeleteTag() {
+    let tagCount = 1;
     let tagList = document.querySelector("#TagList");
+    if (!tagList) return false;
     let selectedIndex = tagList.selectedIndex;
 
     if (selectedIndex >= 0) {
@@ -28,6 +41,11 @@ function DeleteTag() {
         tagList.remove(selectedIndex); 
         // Decrement index since an option was removed
         index--;  
+    }
+    if (tagList.selectedIndex == -1) {
+        swalWithDarkButton.fire({
+            html: "<span class='font-weight-bolder'>CHOOSE A TAG BEFORE DELETING</span>"
+        });
     }
 }
 
@@ -41,7 +59,7 @@ if (tagValues != "") {
 }
 
 function ReplaceTag(tag, index) {
-    let newOption = newOption(tag, tag);
+    let newOption = new Option(tag, tag);
     document.querySelector("#TagList").options[index] = newOption;
 
 }
@@ -51,3 +69,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentYear = new Date().getFullYear();
     document.querySelector("#currentYear").textContent = currentYear;
 });
+
+//Search() detects an empty and/or duplicate tag & returns an error string
+function Search(str) {
+    if (str === "") {
+        return "Empty tags are not permitted.";
+    }
+    varEl = document.querySelector("#TagList");
+    if (tagsEl) {
+        let options = tagsEl.options;
+        for (let index = 0; index < options.length; index++) {
+            if (options[index].value == str) {
+                return "The Tag #${str} is a duplicate and not permitted.";
+            }
+        }
+    }
+}
+
+const swalWithDarkButton = Swal.mixin({
+    customClass:{
+        confirmButton: 'btn btn-danger btn-sm btn-block btn-outline-dark'
+    },
+    imageUrl: '/img/default_icon.png',
+    timer: 3000,
+    buttonStyling: false
+})
