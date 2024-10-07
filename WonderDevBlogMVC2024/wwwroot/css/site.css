@@ -33,6 +33,7 @@ h1, h2 {
 .option {
     font-weight: bolder;
 }
+/*SWEET ALERT STYLES*/
 div.swal2-container.swal2-center.swal2-backdrop-show>div{
     outline: 4px solid black;
     border: 2px solid #ff993b;
