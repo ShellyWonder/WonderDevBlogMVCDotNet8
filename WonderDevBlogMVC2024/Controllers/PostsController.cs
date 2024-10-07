@@ -11,6 +11,7 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    #region PRIMARY CONSTRUCTOR
     public class PostsController(IPostService postService, IBlogService blogService, 
                                  IApplicationUserService applicationUserService, 
                                  IImageService imageService,
@@ -25,14 +26,17 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly ISlugService _slugService = slugService;
         private readonly ITagService _tagService = tagService;
 
-        // GET: Posts
+        #endregion
+
+        #region GET POSTS/INDEX
         public async Task<IActionResult> Index()
         {
             var posts = await _postService.GetAllPostsAsync();
             return View(posts);
         }
+        #endregion
 
-        // GET: Posts/Details/5
+        #region GET DETAILS       
         public async Task<IActionResult> Details(string slug)
         {
             if (string.IsNullOrEmpty(slug))
@@ -49,7 +53,9 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(post);
         }
+        #endregion
 
+        #region GET CREATE 
         // GET: Posts/Create
         [Authorize]
         public async Task<IActionResult> Create()
@@ -57,9 +63,9 @@ namespace WonderDevBlogMVC2024.Controllers
             await PopulateViewDataAsync();
             return View();
         }
+        #endregion
 
-        // POST: Posts/Create
-
+        #region Post Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post,List<string>tagValues)
@@ -75,18 +81,41 @@ namespace WonderDevBlogMVC2024.Controllers
                 // Get the current user ID
                 var authorId = _userManager.GetUserId(User);
                 post.AuthorId = authorId;
+
+                #region SLUG CREATION AND VALIDATION 
+                //
                 var slug = _slugService.UrlFriendly(post.Title);
+
+                var validationError = false;
+
+                    //check for blank or malformed slugs
+                    if (string.IsNullOrEmpty(slug))
+                    {
+                        validationError = true;
+                        ModelState.AddModelError("", "The title is not valid. Please provide another title.");
+                    }
+                    //detect incoming duplicate slugs
                     if (!_slugService.IsUnique(slug))
                     {
+                        validationError = true;
                         ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
+                        ;
+                    }
+
+                    if (validationError) {
                         ViewData["tagValues"] = string.Join(", ", tagValues);
                         return View(post);
                     }
 
-                    post.Slug = slug;
+                    post.Slug = slug;//END SLUG CREATION AND VALIDATION
+                #endregion
 
-                    // Convert the uploaded image to a byte array and store it in database
-                    post = await ImageImplementationAsync(post);
+                #region IMAGE HANDLING
+                // Convert the uploaded image to a byte array and store it in database
+                post = await ImageImplementationAsync(post);
+                #endregion
+
+                #region TAG CREATION AND VALIDATION
 
                 foreach (var tagText in tagValues)
                 {
@@ -94,7 +123,9 @@ namespace WonderDevBlogMVC2024.Controllers
                     await _tagService.AddTagAsync(tagText, post.Id, authorId!);
                 }
 
+                #endregion CREATION AND VALIDATION
 
+                #region SAVE
                 // Pass userId to the service/repository
                 await _postService.AddPostAsync(post, authorId!);
                     return RedirectToAction(nameof(Index));
@@ -105,8 +136,11 @@ namespace WonderDevBlogMVC2024.Controllers
                     //  if needed, return a custom error message
                     return HandleError($"An error occurred while creating the post: {ex.Message}");
                 }
+            #endregion
         }
-            
+        #endregion
+
+        #region GET EDIT
         // GET: Posts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -125,10 +159,10 @@ namespace WonderDevBlogMVC2024.Controllers
             ViewData["TagValues"] = string.Join(",",post.Tags.Select(t => t.Text));
             return View(post);
         }
+        #endregion
 
-        // POST: Posts/Edit/5
-
-        [HttpPost]
+        #region POST EDIT
+       [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogId,Title,Abstract,Content,BlogPostState")]
                                               Post post, IFormFile newImage,List<string>tagValues)
@@ -144,7 +178,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 {
                     // Get the current user ID
                     var userId = _userManager.GetUserId(User);
-                    // Get the current blog ID
+                    // Get current blog ID FROM EXISTING POST
                     var newPost = await _postService.GetPostByIdAsync(post.Id);
 
                     if (newPost.Title != newPost.Title) newPost.Title = post.Title;
@@ -152,14 +186,31 @@ namespace WonderDevBlogMVC2024.Controllers
                     if (newPost.Content != newPost.Content) newPost.Content = post.Content;
                     if (newPost.BlogPostState != newPost.BlogPostState) newPost.BlogPostState = post.BlogPostState;
 
-                    // Check if a new image has been uploaded
+                    #region SLUGS
+                    // Generate a new slug from the updated title and validate uniqueness
+                    var newSlug = _slugService.UrlFriendly(post.Title);
+
+                    if (newSlug != newPost.Slug &&  _slugService.IsUnique(newSlug))
+                    {
+                        newPost.Slug = newSlug;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Title", "This title is a duplicate of a previous post. Please choose another title");
+                    }
+                    #endregion
+
+                    #region IMAGE
+                    // If a new image is provided, process and update it
                     if (newImage != null)
                     {
                         // Assign the new image to the ImageFile property of the Blog object
                         newPost.ImageFile = newImage;
                         // Convert the uploaded image to a byte array and store it in the database
                         newPost = await ImageImplementationAsync(newPost);
+                    #endregion
 
+                        #region TAGS
                         //Remove all tags associated with the post
                         await _tagService.RemoveAllTagsByPostIdAsync(post.Id);
 
@@ -170,9 +221,12 @@ namespace WonderDevBlogMVC2024.Controllers
                         }
 
                     }
+                    #endregion
+                    #region SAVE
                     // Pass userId to the service/repository,updating the rest of the post
                     await _postService.UpdatePostAsync(post, userId!);
                     return RedirectToAction(nameof(Index));
+                    #endregion
                 }
                 catch (KeyNotFoundException)
                 {
@@ -182,9 +236,9 @@ namespace WonderDevBlogMVC2024.Controllers
             await PopulateViewDataAsync(post);
             return View(post);
         }
+        #endregion
 
-
-        // GET: Posts/Delete/5
+        #region GET DELETE
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -200,8 +254,9 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(post);
         }
+        #endregion
 
-        // POST: Posts/Delete/5
+        #region POST DELETE
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -214,7 +269,9 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             return await _postService.PostExistsAsync(id);
         }
+        #endregion
 
+        #region POPULATE VIEW DATA
         private async Task PopulateViewDataAsync(Post? post = null)
         {
             {
@@ -228,6 +285,9 @@ namespace WonderDevBlogMVC2024.Controllers
 
             }
         }
+        #endregion
+
+        #region IMAGE IMPLEMENTATION
         private async Task<Post> ImageImplementationAsync(Post post)
         {
             if (post.ImageFile != null)
@@ -244,7 +304,9 @@ namespace WonderDevBlogMVC2024.Controllers
             }
             return post;
         }
+        #endregion
 
+        #region HANDLE ERROR 
         private ViewResult HandleError(string errorMessage)
         {
             var errorModel = new ErrorModel
@@ -255,4 +317,5 @@ namespace WonderDevBlogMVC2024.Controllers
             return View("Error", errorModel); 
         }
     }
+    #endregion
 }
