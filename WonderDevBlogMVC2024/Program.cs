@@ -9,6 +9,7 @@ using WonderDevBlogMVC2024.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.GitHub;
+using WonderDevBlogMVC2024.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,30 +68,8 @@ builder.Services.AddRazorComponents();
 
 builder.Services.AddControllersWithViews();
 
-//Register services, repositories and interfaces
-builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<IBlogService, BlogService>();
-builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<ITagService, TagService>();
-builder.Services.AddScoped<DataService>();
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-builder.Services.AddScoped<IBlogEmailSender, EmailSender>();
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<ISlugRepository, SlugRepository>();
-builder.Services.AddScoped<ISlugService, SlugService>();
-
-//configuring max file sizes in form uploads
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 1024 * 1024 * 10; // 10MB
-});
-
+//Register services, repositories and interfaces via the extension method
+builder.Services.AddCustomServices(builder.Configuration);  
 
 var app = builder.Build();
 
@@ -121,7 +100,6 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
 
 // Register MVC route and Razor Pages
 app.MapControllerRoute(
