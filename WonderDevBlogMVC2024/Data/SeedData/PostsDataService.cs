@@ -9,7 +9,7 @@ namespace WonderDevBlogMVC2024.Data.SeedData
     {
         private readonly ApplicationDbContext _context = context;
 
-        public async Task SeedPostsAndComments()
+        public async Task SeedPostsAndCommentsAsync()
         {
             if (context.Posts.Any())
             {

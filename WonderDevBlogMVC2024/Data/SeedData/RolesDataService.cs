@@ -1,16 +1,30 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using WonderDevBlogMVC2024.Enums;
 
 namespace WonderDevBlogMVC2024.Data.SeedData
 {
-    public class RolesDataService(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+    public class RolesDataService
     {
-        private readonly ApplicationDbContext _context = context;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<RolesDataService> _logger ;
 
-        public async Task SetupDB()
+        public RolesDataService(ApplicationDbContext context, 
+                                RoleManager<IdentityRole> roleManager, 
+                                UserManager<ApplicationUser> userManager, 
+                                ILogger<RolesDataService> logger)
+        {
+            _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
+            _logger = logger;
+        }
+
+
+        public async Task SetupDBAsync()
         {
             //Run the migration async
             await _context.Database.MigrateAsync();
@@ -102,7 +116,7 @@ namespace WonderDevBlogMVC2024.Data.SeedData
             catch (Exception ex)
             {
 
-
+                _logger.LogError(ex, "An error occurred while seeding users.");
             }
         }
         private async Task SeedRolesAsync()

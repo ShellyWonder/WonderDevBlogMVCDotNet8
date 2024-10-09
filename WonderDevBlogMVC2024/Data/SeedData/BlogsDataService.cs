@@ -14,7 +14,7 @@ namespace WonderDevBlogMVC2024.Data.SeedData
             _context = context;
             _userManager = userManager;
         }
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
            
             // Check if the database has been seeded

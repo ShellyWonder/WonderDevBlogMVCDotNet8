@@ -74,21 +74,8 @@ builder.Services.AddCustomServices(builder.Configuration);
 
 var app = builder.Build();
 
-// Call DataService to seed the database
-using (var scope = app.Services.CreateScope())
-{
-    var rolesDataService = scope.ServiceProvider.GetRequiredService<RolesDataService>();
-    // Call the SetupDB method to run migrations and seed roles/users
-    await rolesDataService.SetupDB();
-
-    var postsDataService = scope.ServiceProvider.GetRequiredService<PostsDataService>();
-    await postsDataService.SeedPostsAndComments(); 
-
-    var blogsDataService = scope.ServiceProvider.GetRequiredService<BlogsDataService>();
-    // Call the SetupDB method to run migrations and seed roles/users
-    await blogsDataService.Initialize(); 
-
-}
+// Call to seed the database(DatabaseSeederExtensions.cs)
+await app.SeedDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
