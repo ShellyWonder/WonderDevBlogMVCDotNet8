@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-WonderDevBlogMVC2024-c1e974d9-1e55-4ba4-be80-bd6b9fbe56b1</UserSecretsId>
+		<NoWarn>NU1902,CS9124,NU1901</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
