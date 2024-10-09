@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Enums;
 
-namespace WonderDevBlogMVC2024.Data
+namespace WonderDevBlogMVC2024.Data.SeedData
 {
-    public class DataService(ApplicationDbContext dbContext, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+    public class RolesDataService(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
     {
-        readonly ApplicationDbContext _context = dbContext;
+        private readonly ApplicationDbContext _context = context;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 

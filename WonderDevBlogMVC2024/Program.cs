@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.GitHub;
 using WonderDevBlogMVC2024.Extensions;
+using WonderDevBlogMVC2024.Data.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,9 +77,17 @@ var app = builder.Build();
 // Call DataService to seed the database
 using (var scope = app.Services.CreateScope())
 {
-    var dataService = scope.ServiceProvider.GetRequiredService<DataService>();
+    var rolesDataService = scope.ServiceProvider.GetRequiredService<RolesDataService>();
     // Call the SetupDB method to run migrations and seed roles/users
-    await dataService.SetupDB(); 
+    await rolesDataService.SetupDB();
+
+    var postsDataService = scope.ServiceProvider.GetRequiredService<PostsDataService>();
+    await postsDataService.SeedPostsAndComments(); 
+
+    var blogsDataService = scope.ServiceProvider.GetRequiredService<BlogsDataService>();
+    // Call the SetupDB method to run migrations and seed roles/users
+    await blogsDataService.Initialize(); 
+
 }
 
 // Configure the HTTP request pipeline.
@@ -102,9 +111,18 @@ app.UseRouting();
 app.UseAuthorization();
 
 // Register MVC route and Razor Pages
+
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//custom route
+app.MapControllerRoute(
+    name: "SlugRoute",
+    pattern:"BlogPosts/UrlFriendly/{slug}",
+    defaults: new {controller="Posts", action = "Details" });
+
 app.MapRazorPages();
 
 app.Run();

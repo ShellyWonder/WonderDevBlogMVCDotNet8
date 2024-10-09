@@ -5,6 +5,7 @@ using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Services.Interfaces;
 using WonderDevBlogMVC2024.Services;
 using WonderDevBlogMVC2024.ViewModels;
+using WonderDevBlogMVC2024.Data.SeedData;
 
 namespace WonderDevBlogMVC2024.Extensions
 {
@@ -23,12 +24,15 @@ namespace WonderDevBlogMVC2024.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ITagService, TagService>();
-            services.AddScoped<DataService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.AddScoped<IBlogEmailSender, EmailSender>();
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<ISlugRepository, SlugRepository>();
             services.AddScoped<ISlugService, SlugService>();
+            //data seed services
+            services.AddTransient<RolesDataService>();
+            services.AddTransient<BlogsDataService>();
+            services.AddTransient<PostsDataService>();
 
             // Configure form options
             services.Configure<FormOptions>(options =>
