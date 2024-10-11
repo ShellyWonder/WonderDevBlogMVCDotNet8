@@ -5,6 +5,7 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
     public interface IPostService
     {
         Task<IEnumerable<Post>> GetAllPostsAsync();
+        Task<IEnumerable<Post>> GetAllPostsByBlogIdAsync(int id);
         Task<Post> GetPostByIdAsync(int id);
         Task<Post> GetPostBySlugAsync(string slug);
         Task AddPostAsync(Post post, string userId);

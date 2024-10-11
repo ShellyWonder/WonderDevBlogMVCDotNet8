@@ -38,6 +38,10 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetPostsByBlogIdAsync(int id)
+        {
+            return await _context.Posts.Where(p => p.BlogId == id).ToListAsync();
+        }
 
         public async Task<Post> GetPostByIdAsync(int id)
         {
