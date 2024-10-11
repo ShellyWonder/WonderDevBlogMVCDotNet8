@@ -7,14 +7,18 @@ using WonderDevBlogMVC2024.ViewModels;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, IBlogEmailSender emailSender) : Controller
+    public class HomeController(ILogger<HomeController> logger, 
+                                IBlogEmailSender emailSender,
+                                IBlogService blogService) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
         private readonly IBlogEmailSender _emailSender = emailSender;
+        private readonly IBlogService _blogService = blogService;
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var blogs = await _blogService.GetAllBlogsAsync();
+            return View(blogs);
         }
 
          public IActionResult About()
