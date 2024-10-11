@@ -29,6 +29,11 @@ namespace WonderDevBlogMVC2024.Services
             return await _postRepository.GetAllPostsAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetAllPostsByBlogIdAsync(int id)
+        {
+            return await _postRepository.GetPostsByBlogIdAsync(id);
+        }
+
         public async Task<Post> GetPostByIdAsync(int id)
         {
             return await _postRepository.GetPostByIdAsync(id);

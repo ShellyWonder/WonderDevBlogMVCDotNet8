@@ -36,6 +36,15 @@ namespace WonderDevBlogMVC2024.Controllers
         }
         #endregion
 
+        #region GET ALL BLOG POSTS INDEX BY BLOG
+        public async Task<IActionResult>BlogPostIndex(int id)
+        {
+            var posts = await _postService.GetAllPostsByBlogIdAsync(id);
+            return View("index", posts);
+        }
+
+        #endregion
+
         #region GET DETAILS       
         public async Task<IActionResult> Details(string slug)
         {
@@ -65,7 +74,7 @@ namespace WonderDevBlogMVC2024.Controllers
         }
         #endregion
 
-        #region Post Create
+        #region POST CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BlogId,Title,Abstract,Content,BlogPostState,ImageFile")] Post post,List<string>tagValues)
@@ -95,15 +104,17 @@ namespace WonderDevBlogMVC2024.Controllers
                         ModelState.AddModelError("", "The title is not valid. Please provide another title.");
                     }
                     //detect incoming duplicate slugs
-                    if (!_slugService.IsUnique(slug))
+                   else if (!_slugService.IsUnique(slug))
                     {
                         validationError = true;
                         ModelState.AddModelError("Title", "The title you provided is a duplicate of an existing title. Therefore, it cannot be used again.");
                         ;
                     }
 
-                    if (validationError) {
-                    PopulateTagValues(post);
+                    if (validationError)
+                {
+                    ViewData["TagValues"]= string.Join(",",tagValues);
+
                     return View(post);
                     }
 
@@ -198,6 +209,7 @@ namespace WonderDevBlogMVC2024.Controllers
                     {
                         ModelState.AddModelError("Title", "This title is a duplicate of a previous post. Please choose another title");
                         PopulateTagValues(post);
+                        await PopulateViewDataAsync(post);//Test this line Slugs 13 use EXISTING(newPost) post
                         return View(post);
                     }
                     #endregion
