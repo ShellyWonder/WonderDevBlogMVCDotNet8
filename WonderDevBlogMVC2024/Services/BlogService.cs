@@ -1,8 +1,9 @@
 ﻿using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
-using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
+using X.PagedList;
+using X.PagedList.EF;
 
 namespace WonderDevBlogMVC2024.Services
 {
@@ -15,6 +16,10 @@ namespace WonderDevBlogMVC2024.Services
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
         {
             return await _blogRepository.GetAllBlogsAsync();
+        }
+        public async Task<IPagedList<Blog>> GetAllProdBlogsAsync(int pageNumber, int pageSize)
+        {
+            return await _blogRepository.GetAllProdBlogsAsync(pageNumber, pageSize);
         }
 
         public async Task<Blog?> GetBlogByIdAsync(int id)

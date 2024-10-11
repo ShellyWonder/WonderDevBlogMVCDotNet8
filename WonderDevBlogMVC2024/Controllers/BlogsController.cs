@@ -10,6 +10,7 @@ using WonderDevBlogMVC2024.Areas.Identity.Pages;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    #region PRIMARY CONSTRUCTOR
     public class BlogsController(IBlogService blogService,
                  UserManager<ApplicationUser> userManager,
                  IImageService imageService) : Controller
@@ -17,16 +18,17 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly IBlogService _blogService = blogService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IImageService _imageService = imageService;
+        #endregion
 
-
-        // GET: Blogs
+        #region GET BLOGS INDEX
         public async Task<IActionResult> Index()
         {
             var blogs = await _blogService.GetAllBlogsAsync();
             return View(blogs);
         }
+        #endregion
 
-        // GET: Blogs/Details/5
+        #region GET BLOG DETAILS
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,15 +44,18 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(blog);
         }
+        #endregion
 
-        // GET: Blogs/Create
+        #region GET BLOG CREATE
         [Authorize]
         public IActionResult Create()
         {
 
             return View();
         }
+        #endregion
 
+        #region POST CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
         //When component is created, replace Image in bind appropriately
@@ -70,9 +75,9 @@ namespace WonderDevBlogMVC2024.Controllers
             }
             return View(blog);
         }
+        #endregion
 
-
-        // GET: Blogs/Edit/5
+        #region GET EDIT
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -88,8 +93,9 @@ namespace WonderDevBlogMVC2024.Controllers
             }
             return View(blog);
         }
+        #endregion
 
-        // POST: Blogs/Edit/5
+        #region POST EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Blog blog, IFormFile newImage)
@@ -138,7 +144,9 @@ namespace WonderDevBlogMVC2024.Controllers
             }
             return View(blog);
         }
+        #endregion
 
+        #region GET DELETE
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -154,8 +162,9 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(blog);
         }
+        #endregion
 
-        // POST: Blogs/Delete/5
+        #region POST DELETE
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -163,17 +172,24 @@ namespace WonderDevBlogMVC2024.Controllers
             await _blogService.DeleteBlogAsync(id);
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region BLOG EXISTS
         private async Task<bool> BlogExists(int id)
         {
             return await _blogService.BlogExistsAsync(id);
         }
+        #endregion
 
+        #region POP AUTHORS
         private async Task PopulateAuthorsDropDownList(object? selectedAuthor = null)
         {
             var authors = await _blogService.GetAllAuthorsAsync();
             ViewData["AuthorId"] = new SelectList(authors, "Id", "FullName", selectedAuthor);
         }
+        #endregion
+
+        #region IMG IMPLEMENTATION
         private async Task<Blog> ImageImplementationAsync(Blog blog)
         {
             if (blog.ImageFile != null)
@@ -190,7 +206,9 @@ namespace WonderDevBlogMVC2024.Controllers
             }
             return blog;
         }
+        #endregion
 
+        #region HANDLE ERROR
         private ViewResult HandleError(string errorMessage)
         {
             var errorModel = new ErrorModel
@@ -200,5 +218,6 @@ namespace WonderDevBlogMVC2024.Controllers
             // Return the error view with the message
             return View("Error", errorModel);
         }
+        #endregion
     }
 }

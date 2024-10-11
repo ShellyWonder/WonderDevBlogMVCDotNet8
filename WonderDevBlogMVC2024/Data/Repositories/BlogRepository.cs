@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
+using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
+using X.PagedList;
+using X.PagedList.EF;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
@@ -45,6 +48,13 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
         {
             return await _context.Blogs.Include(b => b.Author).ToListAsync();
+        }
+
+        public async Task<IPagedList<Blog>> GetAllProdBlogsAsync(int pageNumber, int pageSize)
+       {
+            return await _context.Blogs.Where(b => b.Posts.Any(p =>p.BlogPostState == PostState.ProductionReady))
+                                        .OrderByDescending(b => b.Created)
+                                        .ToPagedListAsync(pageNumber, pageSize);
         }
 
         
