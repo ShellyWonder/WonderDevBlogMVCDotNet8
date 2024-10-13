@@ -44,20 +44,22 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-
+        //Note to Dev: no longer needed??
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
         {
-            return await _context.Blogs.Include(b => b.Author).ToListAsync();
+            return await _context.Blogs.Include(b => b.Author)
+                                       .OrderByDescending(b => b.Created)
+                                       .ToListAsync();
         }
 
-        public async Task<IPagedList<Blog>> GetAllProdBlogsAsync(int pageNumber, int pageSize)
-       {
-            return await _context.Blogs.Where(b => b.Posts.Any(p =>p.BlogPostState == PostState.ProductionReady))
-                                        .OrderByDescending(b => b.Created)
-                                        .ToPagedListAsync(pageNumber, pageSize);
+        public async Task<IPagedList<Blog>> GetBlogsByStateAsync(PostState postState, int pageNumber, int pageSize)
+        {
+            return await _context.Blogs.Include(b => b.Author)
+                                       .Where(b => b.Posts.Any(p => p.BlogPostState == postState))
+                                       .OrderByDescending(b => b.Created)
+                                       .ToPagedListAsync(pageNumber, pageSize);
         }
 
-        
-        
+
     }
 }

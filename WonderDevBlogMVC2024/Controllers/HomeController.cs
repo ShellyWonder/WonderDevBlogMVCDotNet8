@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 using WonderDevBlogMVC2024.ViewModels;
-using X.PagedList;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
@@ -19,7 +19,8 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             var pageNumber = page ?? 1;
             var pageSize = 5;
-            var blogs = await _blogService.GetAllProdBlogsAsync(pageNumber, pageSize);
+            //Grabs all status: productionReady posts by blog in descending order by date
+            var blogs = await _blogService.GetBlogsByStateAsync(PostState.ProductionReady, pageNumber, pageSize);
             return View(blogs);
         }
 
