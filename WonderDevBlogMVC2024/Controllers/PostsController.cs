@@ -1,9 +1,7 @@
-﻿using MailKit.Search;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting;
 using WonderDevBlogMVC2024.Areas.Identity.Pages;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
@@ -32,6 +30,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region SEARCH INDEX
+        [AllowAnonymous]
         public async Task<IActionResult> SearchIndex(int? page, string searchTerm)
         {
             if (string.IsNullOrEmpty(searchTerm))
@@ -49,6 +48,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET POSTS/INDEX
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var posts = await _postService.GetAllPostsAsync();
@@ -57,6 +57,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET ALL BLOG POSTS INDEX BY BLOG
+        [AllowAnonymous]
         public async Task<IActionResult>BlogPostIndex(int id, int? page)
         {
             var pageNumber = page ?? 1;
@@ -67,7 +68,8 @@ namespace WonderDevBlogMVC2024.Controllers
 
         #endregion
 
-        #region GET DETAILS       
+        #region GET DETAILS  
+        [AllowAnonymous]
         public async Task<IActionResult> Details(string slug)
         {
             if (string.IsNullOrEmpty(slug))
@@ -87,8 +89,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET CREATE 
-        // GET: Posts/Create
-        [Authorize]
+        [Authorize(Roles = "Administrator, Author")]
         public async Task<IActionResult> Create()
         {
             await PopulateViewDataAsync();
@@ -140,7 +141,7 @@ namespace WonderDevBlogMVC2024.Controllers
                     return View(post);
                     }
 
-                    post.Slug = slug;//END SLUG CREATION AND VALIDATION
+                    post.Slug = slug;
                 #endregion
 
                 #region IMAGE HANDLING
@@ -156,7 +157,7 @@ namespace WonderDevBlogMVC2024.Controllers
                     await _tagService.AddTagAsync(tagText, post.Id, authorId!);
                 }
 
-                #endregion CREATION AND VALIDATION
+                #endregion 
 
                 #region SAVE
                 // Pass userId to the service/repository
@@ -174,7 +175,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET EDIT
-        // GET: Posts/Edit/5
+        [Authorize(Roles = "Administrator, Author")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -246,18 +247,19 @@ namespace WonderDevBlogMVC2024.Controllers
                         newPost = await ImageImplementationAsync(newPost);
                     #endregion
 
-                        #region TAGS
-                        //Remove all tags associated with the post
-                        await _tagService.RemoveAllTagsByPostIdAsync(post.Id);
+                    #region TAGS
+                    //Remove all tags associated with the post
+                    await _tagService.RemoveAllTagsByPostIdAsync(post.Id);
 
-                        // Add the new tags to the post
-                        foreach (var tagText in tagValues)
-                        {
-                            await _tagService.AddTagAsync(tagText, post.Id, userId!);
-                        }
-
+                    // Add the new tags to the post
+                    foreach (var tagText in tagValues)
+                    {
+                        await _tagService.AddTagAsync(tagText, post.Id, userId!);
                     }
-                    #endregion
+
+                        }
+                        #endregion
+
                     #region SAVE
                     // Pass userId to the service/repository,updating the rest of the post
                     await _postService.UpdatePostAsync(post, userId!);
