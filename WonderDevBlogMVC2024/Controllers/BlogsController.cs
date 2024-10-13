@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
-using WonderDevBlogMVC2024.Areas.Identity.Pages;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
     #region PRIMARY CONSTRUCTOR
     public class BlogsController(IBlogService blogService,
                  UserManager<ApplicationUser> userManager,
+                 IErrorHandlingService errorHandlingService,
                  IImageService imageService) : Controller
     {
         private readonly IBlogService _blogService = blogService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IErrorHandlingService _errorHandlingService = errorHandlingService;
         private readonly IImageService _imageService = imageService;
         #endregion
 
@@ -84,13 +84,13 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id == null)
             {
-                return HandleError($"Blog with ID {id} was not found.");
+                return _errorHandlingService.HandleError($"Blog with ID {id} was not found.");
             }
 
             var blog = await _blogService.GetBlogByIdAsync(id.Value);
             if (blog == null)
             {
-                return HandleError($"Blog with ID {id} was not found.");
+                return _errorHandlingService.HandleError($"Blog with ID {id} was not found.");
             }
             return View(blog);
         }
@@ -103,7 +103,7 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id != blog.Id)
             {
-                return HandleError($"Blog with ID {blog.Id} was not found.");
+                return _errorHandlingService.HandleError($"Blog with ID {blog.Id} was not found.");
             }
 
             if (ModelState.IsValid)
@@ -139,7 +139,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 catch (KeyNotFoundException)
                 {
 
-                    return HandleError($"Blog with ID {blog.Id} was not found.");
+                    return _errorHandlingService.HandleError($"Blog with ID {blog.Id} was not found.");
                 }
 
             }
@@ -153,13 +153,13 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id == null)
             {
-                return HandleError($"Blog with ID {id} was not found.");
+                return _errorHandlingService.HandleError($"Blog with ID {id} was not found.");
             }
 
             var blog = await _blogService.GetBlogByIdAsync(id.Value);
             if (blog == null)
             {
-                return HandleError($"Blog with ID {id} was not found.");
+                return _errorHandlingService.HandleError($"Blog with ID {id} was not found.");
             }
 
             return View(blog);
@@ -210,16 +210,6 @@ namespace WonderDevBlogMVC2024.Controllers
         }
         #endregion
 
-        #region HANDLE ERROR
-        private ViewResult HandleError(string errorMessage)
-        {
-            var errorModel = new ErrorModel
-            {
-                CustomErrorMessage = errorMessage
-            };
-            // Return the error view with the message
-            return View("Error", errorModel);
-        }
-        #endregion
+        
     }
 }

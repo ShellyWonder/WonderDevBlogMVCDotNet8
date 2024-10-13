@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using WonderDevBlogMVC2024.Areas.Identity.Pages;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
@@ -16,7 +15,8 @@ namespace WonderDevBlogMVC2024.Controllers
                                  IImageService imageService,
                                  UserManager<ApplicationUser> userManager,
                                  ISlugService slugService, ITagService tagService,
-                                 ISearchService searchService) : Controller
+                                 ISearchService searchService,
+                                 IErrorHandlingService errorHandlingService) : Controller
     {
         private readonly IPostService _postService = postService;
         private readonly IBlogService _blogService = blogService;
@@ -26,6 +26,7 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly ISlugService _slugService = slugService;
         private readonly ITagService _tagService = tagService;
         private readonly ISearchService _searchService = searchService;
+        private readonly IErrorHandlingService _errorHandlingService = errorHandlingService;
 
         #endregion
 
@@ -35,7 +36,7 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
-                return HandleError($"The search term '{searchTerm}' was not found. Please try again.");
+                return _errorHandlingService.HandleError($"The search term '{searchTerm}' was not found. Please try again.");
             }
 
             ViewData["SearchTerm"] = searchTerm;
@@ -168,7 +169,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 {
 
                     //  if needed, return a custom error message
-                    return HandleError($"An error occurred while creating the post: {ex.Message}");
+                    return _errorHandlingService.HandleError($"An error occurred while creating the post: {ex.Message}");
                 }
             #endregion
         }
@@ -186,7 +187,7 @@ namespace WonderDevBlogMVC2024.Controllers
             var post = await _postService.GetPostByIdAsync(id.Value);
             if (post == null)
             {
-                return HandleError($"Post with ID {id} was not found.");
+                return _errorHandlingService.HandleError($"Post with ID {id} was not found.");
             }
 
             await PopulateViewDataAsync(post);
@@ -203,7 +204,7 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id != post.Id)
             {
-                return HandleError($"Post with ID {post.Id} was not found.");
+                return _errorHandlingService.HandleError($"Post with ID {post.Id} was not found.");
             }
 
             if (ModelState.IsValid)
@@ -268,7 +269,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 }
                 catch (KeyNotFoundException)
                 {
-                    return HandleError($"Post with ID {post.Id} was not found.");
+                    return _errorHandlingService.HandleError($"Post with ID {post.Id} was not found.");
                 }
             }
             await PopulateViewDataAsync(post);
@@ -351,17 +352,6 @@ namespace WonderDevBlogMVC2024.Controllers
             return post;
         }
         #endregion
-
-        #region HANDLE ERROR 
-        private ViewResult HandleError(string errorMessage)
-        {
-            var errorModel = new ErrorModel
-            {
-                CustomErrorMessage = errorMessage
-            };
-            // Return the error view with the message
-            return View("Error", errorModel); 
-        }
     }
-    #endregion
+    
 }

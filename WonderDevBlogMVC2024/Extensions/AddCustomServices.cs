@@ -26,6 +26,7 @@ namespace WonderDevBlogMVC2024.Extensions
             
             services.AddScoped<IBlogEmailSender, EmailSender>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IErrorHandlingService, ErrorHandlingService>();
 
             services.AddScoped<ISlugRepository, SlugRepository>();
             services.AddScoped<ISlugService, SlugService>();
