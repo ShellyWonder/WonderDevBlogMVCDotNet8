@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MailKit.Search;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using WonderDevBlogMVC2024.Areas.Identity.Pages;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
@@ -15,7 +17,8 @@ namespace WonderDevBlogMVC2024.Controllers
                                  IApplicationUserService applicationUserService, 
                                  IImageService imageService,
                                  UserManager<ApplicationUser> userManager,
-                                 ISlugService slugService, ITagService tagService) : Controller
+                                 ISlugService slugService, ITagService tagService,
+                                 ISearchService searchService) : Controller
     {
         private readonly IPostService _postService = postService;
         private readonly IBlogService _blogService = blogService;
@@ -24,6 +27,24 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ISlugService _slugService = slugService;
         private readonly ITagService _tagService = tagService;
+        private readonly ISearchService _searchService = searchService;
+
+        #endregion
+
+        #region SEARCH INDEX
+        public async Task<IActionResult> SearchIndex(int? page, string searchTerm)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return HandleError($"The search term '{searchTerm}' was not found. Please try again.");
+            }
+
+            ViewData["SearchTerm"] = searchTerm;
+            var pageNumber = page ?? 1;
+            var pageSize = 5;
+            var posts = await _searchService.SearchPosts(PostState.ProductionReady,pageNumber,pageSize, searchTerm);
+            return View(posts);
+        }
 
         #endregion
 

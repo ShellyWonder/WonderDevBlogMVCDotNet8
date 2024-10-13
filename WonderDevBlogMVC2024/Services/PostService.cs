@@ -2,6 +2,7 @@
 using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
+using X.PagedList;
 
 namespace WonderDevBlogMVC2024.Services
 {
@@ -27,6 +28,10 @@ namespace WonderDevBlogMVC2024.Services
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
             return await _postRepository.GetAllPostsAsync();
+        }
+        public async Task<IPagedList<Post>> GetAllPostsByStateAsync(PostState postState, int pageNumber, int pageSize, int id)
+        {
+            return await _postRepository.GetAllPostsByStateAsync(postState, pageNumber, pageSize, id);
         }
 
         public async Task<IEnumerable<Post>> GetAllPostsByBlogIdAsync(int id)
