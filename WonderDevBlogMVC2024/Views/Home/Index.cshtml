@@ -1,7 +1,8 @@
 ﻿@using System.Collections
+@using X.PagedList
+@using X.PagedList.Mvc.Core
 @using WonderDevBlogMVC2024.Models
-@model IEnumerable<Blog>
-
+@model IPagedList<WonderDevBlogMVC2024.Models.Blog>
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -85,26 +86,35 @@
             }
             else
             {
-
                 <div class="text-center">
                     <p>Currently, no blogs are available to display.</p>
 
                 </div>
-
             }
 
         </div>
     </div>
-    @* @if (blogs?.TotalPages > 1)
-    {
-        <div class="my-3">
-            <Paginator CurrentPage="blogs?.Page ?? 1"
-                       TotalPages="blogs?.TotalPages > 500 ? 500 : blogs?.TotalPages ?? 0"
-                       OnPageChange="HandlePageChange" />
-
-        </div>
-
-    }
- *@
+</div>
+<div class="row">
+    <div class="col h3">
+        Page @(Model!.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    </div>
 </div>
 
+<!-- Pagination controls -->
+<div class="row">
+    <div class="col">
+
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new string[] {"page-item"},
+            PageClasses = new string[] {"page-link"}
+        });
+        
+    </div>
+</div>
+
+
+
+  

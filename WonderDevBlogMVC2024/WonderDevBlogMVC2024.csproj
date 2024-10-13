@@ -5,26 +5,29 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-WonderDevBlogMVC2024-c1e974d9-1e55-4ba4-be80-bd6b9fbe56b1</UserSecretsId>
-		<NoWarn>NU1902,CS9124,NU1901</NoWarn>
+		<NoWarn>NU1902,CS9124,NU1901,NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.2.0" />
     <PackageReference Include="MailKit" Version="4.8.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
     <PackageReference Include="MimeKit" Version="4.8.0" />
+    <PackageReference Include="X.PagedList" Version="10.2.1" />
+    <PackageReference Include="X.PagedList.EF" Version="10.2.1" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="10.2.1" />
   </ItemGroup>
 
 </Project>
