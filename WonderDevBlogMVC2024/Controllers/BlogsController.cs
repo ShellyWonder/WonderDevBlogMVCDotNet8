@@ -21,6 +21,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET BLOGS INDEX
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var blogs = await _blogService.GetAllBlogsAsync();
@@ -47,7 +48,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET BLOG CREATE
-        [Authorize]
+        [Authorize(Roles = "Administrator,Author")]
         public IActionResult Create()
         {
 
@@ -78,18 +79,18 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET EDIT
-        [Authorize]
+        [Authorize(Roles = "Administrator,Author")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return HandleError($"Blog with ID {id} was not found.");
             }
 
             var blog = await _blogService.GetBlogByIdAsync(id.Value);
             if (blog == null)
             {
-                return NotFound();
+                return HandleError($"Blog with ID {id} was not found.");
             }
             return View(blog);
         }
@@ -147,6 +148,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET DELETE
+        [Authorize(Roles = "Administrator,Author")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
