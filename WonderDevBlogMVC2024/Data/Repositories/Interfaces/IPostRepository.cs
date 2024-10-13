@@ -1,10 +1,13 @@
-﻿using WonderDevBlogMVC2024.Models;
+﻿using WonderDevBlogMVC2024.Enums;
+using WonderDevBlogMVC2024.Models;
+using X.PagedList;
 
 namespace WonderDevBlogMVC2024.Data.Repositories.Interfaces
 {
     public interface IPostRepository
     {
         Task<IEnumerable<Post>> GetAllPostsAsync();
+        Task<IPagedList<Post>> GetAllPostsByStateAsync(PostState postState, int pageNumber, int pageSize, int id);
 
         Task<IEnumerable<Post>> GetPostsByBlogIdAsync(int id);
         Task<Post> GetPostByIdAsync(int id);

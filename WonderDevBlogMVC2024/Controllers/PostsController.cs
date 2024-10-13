@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting;
-using System.Reflection.Metadata;
 using WonderDevBlogMVC2024.Areas.Identity.Pages;
 using WonderDevBlogMVC2024.Data;
+using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
@@ -37,10 +36,12 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET ALL BLOG POSTS INDEX BY BLOG
-        public async Task<IActionResult>BlogPostIndex(int id)
+        public async Task<IActionResult>BlogPostIndex(int id, int? page)
         {
-            var posts = await _postService.GetAllPostsByBlogIdAsync(id);
-            return View("index", posts);
+            var pageNumber = page ?? 1;
+            var pageSize = 5;
+            var posts = await _postService.GetAllPostsByStateAsync(PostState.ProductionReady, pageNumber, pageSize, id);
+            return View(posts);
         }
 
         #endregion

@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
+using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
+using X.PagedList;
+using X.PagedList.EF;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
@@ -29,13 +32,22 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-
+        //may delete if deemed unnecessary later
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
             return await _context.Posts
                 .Include(p => p.Author)
                 .Include(p => p.Blog)
                 .ToListAsync();
+        }
+        //This method allows for any of three post states(Enum) to be passed in as parameters. Will be reused when authorization is implemented
+        public async Task<IPagedList<Post>> GetAllPostsByStateAsync(PostState postState, int pageNumber, int pageSize, int id)
+        {
+            return await _context.Posts
+                                 .Include(p => p.Author)
+                                 .Where(p => p.BlogId == id && p.BlogPostState == postState)
+                                 .OrderByDescending(p => p.Created)
+                                 .ToPagedListAsync(pageNumber, pageSize);
         }
 
         public async Task<IEnumerable<Post>> GetPostsByBlogIdAsync(int id)
