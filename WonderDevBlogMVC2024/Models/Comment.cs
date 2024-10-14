@@ -12,7 +12,7 @@ namespace WonderDevBlogMVC2024.Models
         public string? AuthorId { get; set; }
         public int PostId {  get; set; }
         public string? ModeratorId { get; set; }
-        public string? CommentorId { get; set; }
+        public string? CommentatorId { get; set; }
 
         [Display(Name ="Comment")]
         public string? Body {  get; set; }
@@ -41,7 +41,7 @@ namespace WonderDevBlogMVC2024.Models
 
         public virtual ApplicationUser? Author { get; set; }
 
-        public virtual ApplicationUser? Commentor { get; set; }
+        public virtual ApplicationUser? Commentator { get; set; }
         public virtual ApplicationUser? Moderator { get; set; }
 
         

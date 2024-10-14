@@ -81,14 +81,14 @@ namespace WonderDevBlogMVC2024.Data.SeedData
                 new ()
                 {
                     PostId = flexboxPostId,
-                    CommentorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7", // Doug Michaels
+                    CommentatorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7", // Doug Michaels
                     Body = "Great article! I've always found Flexbox tricky, but this explanation is very clear. Thanks for sharing!",
                     Created = DateTime.UtcNow
                 },
                 new ()
                 {
                     PostId = flexboxPostId,
-                    CommentorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5", // Jack Frost
+                    CommentatorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5", // Jack Frost
                     Body = "I agree with Doug! Flexbox is much easier to understand with this guide. I’ve already applied some of these tips in my project.",
                     Created = DateTime.UtcNow
                 },
@@ -97,14 +97,14 @@ namespace WonderDevBlogMVC2024.Data.SeedData
                 new ()
                 {
                     PostId = blazorPostId,
-                    CommentorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7",
+                    CommentatorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7",
                     Body = "Blazor is fantastic! This post really clarifies why it’s a great tool for .NET developers. I’ve started using it recently and love it.",
                     Created = DateTime.UtcNow
                 },
                 new ()
                 {
                     PostId = blazorPostId,
-                    CommentorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5",
+                    CommentatorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5",
                     Body = "Thanks for this post! I’ve been considering Blazor for a while, and now I’m convinced it’s the right choice for my next project.",
                     Created = DateTime.UtcNow
                 },
@@ -113,14 +113,14 @@ namespace WonderDevBlogMVC2024.Data.SeedData
                 new ()
                 {
                     PostId = jobPrepPostId,
-                    CommentorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7",
+                    CommentatorId = "5fb69d7f-31e4-4fae-9d65-5b9b9eea5fd7",
                     Body = "The 12-week year system sounds like a great approach. I’ve struggled with job preparation in the past, and this seems like a good way to stay organized.",
                     Created = DateTime.UtcNow
                 },
                 new ()
                 {
                     PostId = jobPrepPostId,
-                    CommentorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5",
+                    CommentatorId = "ce8fcfde-5131-4b16-8d86-1f0ec92ac0d5",
                     Body = "I’ve used a similar system, and it really helped me focus my efforts. Great advice here!",
                     Created = DateTime.UtcNow
                 }

@@ -26,9 +26,9 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                        p.Comments.Any(c =>
                            c.Body!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                            c.ModeratedBody!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                           c.Commentor!.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                           c.Commentor.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                           c.Commentor.Email!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                           c.Commentator!.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                           c.Commentator.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                           c.Commentator.Email!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
                        ));
             }
 

@@ -6,7 +6,7 @@
         Moderator,
         //blog post author permissions
         Author,
-        //commentor permissions
-        Commentor
+        //Commentator permissions
+        Commentator
     }
 }

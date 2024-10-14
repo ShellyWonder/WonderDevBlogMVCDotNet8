@@ -75,7 +75,7 @@ namespace WonderDevBlogMVC2024.Data.SeedData
                 LinkdInUrl = "https://linkedIn.com/ShellyWonder",
                 EmailConfirmed = true
             };
-            ApplicationUser commentor = new()
+            ApplicationUser Commentator = new()
             {
                 UserName = "Shelly.Wonder@Outlook.com",
                 Email = "Shelly.Wonder@Outlook.com",
@@ -105,10 +105,10 @@ namespace WonderDevBlogMVC2024.Data.SeedData
                     await _userManager.AddToRoleAsync(author, "Author");
 
                 }
-                if (await _userManager.FindByEmailAsync(commentor.Email) is null)
+                if (await _userManager.FindByEmailAsync(Commentator.Email) is null)
                 {
-                    await _userManager.CreateAsync(commentor, "Abc&123!");
-                    await _userManager.AddToRoleAsync(commentor, "Commentor");
+                    await _userManager.CreateAsync(Commentator, "Abc&123!");
+                    await _userManager.AddToRoleAsync(Commentator, "Commentator");
 
                 }
 

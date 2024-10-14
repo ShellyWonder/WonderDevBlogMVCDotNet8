@@ -31,7 +31,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                 oldNullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "CommentorId",
+                name: "CommentatorId",
                 table: "Comments",
                 type: "nvarchar(450)",
                 nullable: true);
@@ -55,14 +55,14 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                 oldType: "nvarchar(max)");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_CommentorId",
+                name: "IX_Comments_CommentatorId",
                 table: "Comments",
-                column: "CommentorId");
+                column: "CommentatorId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Comments_AspNetUsers_CommentorId",
+                name: "FK_Comments_AspNetUsers_CommentatorId",
                 table: "Comments",
-                column: "CommentorId",
+                column: "CommentatorId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
         }
@@ -71,15 +71,15 @@ namespace WonderDevBlogMVC2024.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Comments_AspNetUsers_CommentorId",
+                name: "FK_Comments_AspNetUsers_CommentatorId",
                 table: "Comments");
 
             migrationBuilder.DropIndex(
-                name: "IX_Comments_CommentorId",
+                name: "IX_Comments_CommentatorId",
                 table: "Comments");
 
             migrationBuilder.DropColumn(
-                name: "CommentorId",
+                name: "CommentatorId",
                 table: "Comments");
 
             migrationBuilder.AlterColumn<string>(

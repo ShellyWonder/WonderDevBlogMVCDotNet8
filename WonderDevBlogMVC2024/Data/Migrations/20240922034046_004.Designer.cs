@@ -301,7 +301,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                     b.Property<string>("Body")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CommentorId")
+                    b.Property<string>("CommentatorId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Created")
@@ -332,7 +332,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("CommentorId");
+                    b.HasIndex("CommentatorId");
 
                     b.HasIndex("ModeratorId");
 
@@ -486,9 +486,9 @@ namespace WonderDevBlogMVC2024.Data.Migrations
                         .WithMany()
                         .HasForeignKey("AuthorId");
 
-                    b.HasOne("WonderDevBlogMVC2024.Data.ApplicationUser", "Commentor")
+                    b.HasOne("WonderDevBlogMVC2024.Data.ApplicationUser", "Commentator")
                         .WithMany()
-                        .HasForeignKey("CommentorId");
+                        .HasForeignKey("CommentatorId");
 
                     b.HasOne("WonderDevBlogMVC2024.Data.ApplicationUser", "Moderator")
                         .WithMany()
@@ -502,7 +502,7 @@ namespace WonderDevBlogMVC2024.Data.Migrations
 
                     b.Navigation("Author");
 
-                    b.Navigation("Commentor");
+                    b.Navigation("Commentator");
 
                     b.Navigation("Moderator");
 
