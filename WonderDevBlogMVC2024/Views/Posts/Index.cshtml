@@ -1,5 +1,6 @@
 ﻿@using WonderDevBlogMVC2024.Services.Interfaces
 @inject IImageService imageService
+@inject ISlugService slugService
 @model IEnumerable<WonderDevBlogMVC2024.Models.Post>
 
 @{
@@ -60,9 +61,9 @@
             </td>
            
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-slug="@item.Slug">Edit</a> |
+                    <a asp-action="Details" asp-route-slug="@item.Slug">Details</a> |
+                    <a asp-action="Delete" asp-route-slug="@item.Slug"></a>
             </td>
         </tr>
 }

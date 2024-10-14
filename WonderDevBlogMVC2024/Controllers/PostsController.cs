@@ -45,7 +45,6 @@ namespace WonderDevBlogMVC2024.Controllers
             var posts = await _searchService.SearchPosts(PostState.ProductionReady,pageNumber,pageSize, searchTerm);
             return View(posts);
         }
-
         #endregion
 
         #region GET POSTS/INDEX
@@ -181,7 +180,7 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Post with ID {id} was not found.");
             }
 
             var post = await _postService.GetPostByIdAsync(id.Value);

@@ -1,26 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Models;
 using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    #region PRIMARY CONSTRUCTOR
     public class CommentsController(ICommentService commentService,
                               IApplicationUserService applicationUserService,
-                              IPostService postService) : Controller
+                              UserManager<ApplicationUser> userManager,
+                              IPostService postService,
+                              IErrorHandlingService errorHandlingService) : Controller
     {
         private readonly ICommentService _commentService = commentService;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IPostService _postService = postService;
+        private readonly IErrorHandlingService _errorHandlingService = errorHandlingService;
+        #endregion
 
-        // GET: Comments
+        #region GET COMMENTS
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _commentService.GetAllCommentsAsync());
         }
+        #endregion
 
-        // GET: Comments/Details/5
+        #region GET DETAILS
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,56 +47,65 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(comment);
         }
+        #endregion
 
-        // GET: Comments/Create
+        #region GET CREATE
+        [Authorize(Roles = "Commentator")]
         public async Task<IActionResult> Create()
         {
             await PopulateSelectLists();
             return View();
         }
+        #endregion
 
-        // POST: Comments/Create
+        #region POST CREATE
+        //NOTE: comment author = Commentator
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AuthorId,PostId,ModeratorId,Body,Created,Updated,Moderated,Deleted,ModeratedBody,ModerationReason")] Comment comment)
+        public async Task<IActionResult> Create([Bind("PostId,Body")]Comment comment)
         {
             if (ModelState.IsValid)
             {
+                // Capture the user's ID and assign it to the CommentatorId
+                comment.CommentatorId = _userManager.GetUserId(User);
+                comment.Created = DateTime.Now;
                 await _commentService.CreateCommentAsync(comment);
                 return RedirectToAction(nameof(Index));
             }
             await PopulateSelectLists();
             return View(comment);
         }
+        #endregion
 
-        // GET: Comments/Edit/5
+        #region GET EDIT
+        [Authorize(Roles = "Commentator,Moderator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
             }
 
             var comment = await _commentService.GetCommentByIdAsync(id.Value);
             if (comment == null)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
             }
             await PopulateSelectLists();
             return View(comment);
         }
+        #endregion
 
-        // POST: Comments/Edit/5
-        
+        #region POST EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,PostId,ModeratorId," +
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,CommentatorId,PostId,ModeratorId," +
             "                                                Body,Created,Updated,Moderated,Deleted," +
             "                                                ModeratedBody,ModerationReason")] Comment comment)
         {
             if (id != comment.Id)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
             }
 
             if (ModelState.IsValid)
@@ -99,7 +119,7 @@ namespace WonderDevBlogMVC2024.Controllers
                 {
                     if (!await CommentExists(comment.Id))
                     {
-                        return NotFound();
+                        return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
                     }
                     else
                     {
@@ -111,25 +131,28 @@ namespace WonderDevBlogMVC2024.Controllers
             await PopulateSelectLists();
             return View(comment);
         }
+        #endregion
 
-        // GET: Comments/Delete/5
+        #region GET DELETE
+        [Authorize(Roles ="Moderator, Commentator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
             }
 
             var comment = await _commentService.GetCommentByIdAsync(id.Value);
             if (comment == null)
             {
-                return NotFound();
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
             }
 
             return View(comment);
         }
+        #endregion
 
-        // POST: Comments/Delete/5
+        #region POST DELETE        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -137,22 +160,29 @@ namespace WonderDevBlogMVC2024.Controllers
             await _commentService.DeleteCommentAsync(id);
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region COMMENT EXISTS
         private async Task<bool> CommentExists(int id)
         {
             return await _commentService.CommentExistsAsync(id);
         }
+        #endregion
 
+        #region POPULATE SELECT LISTS
         private async Task PopulateSelectLists(Comment? comment = null)
         {
             //NOTE: CHANGE VAR DEFINITIONS WHEN ROLES ARE IMPLEMENTED
             var authors = await _applicationUserService.GetAllUsersAsync();
             var moderators = await _applicationUserService.GetAllUsersAsync();
+            var commentators = await _applicationUserService.GetAllUsersAsync();
             var posts = await _postService.GetAllPostsAsync();
 
+            ViewData["CommentatorId"] = new SelectList(commentators, "Id", "Id", comment?.CommentatorId);
             ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", comment?.AuthorId);
             ViewData["ModeratorId"] = new SelectList(moderators, "Id", "Id", comment?.ModeratorId);
             ViewData["PostId"] = new SelectList(posts, "Id", "Id", comment?.PostId);
         }
+        #endregion
     }
 }
