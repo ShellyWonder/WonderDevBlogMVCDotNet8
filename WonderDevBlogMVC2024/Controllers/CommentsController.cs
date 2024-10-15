@@ -99,9 +99,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #region POST EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,CommentatorId,PostId,ModeratorId," +
-            "                                                Body,Created,Updated,Moderated,Deleted," +
-            "                                                ModeratedBody,ModerationReason")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Body")] Comment comment)
         {
             if (id != comment.Id)
             {
@@ -110,8 +108,15 @@ namespace WonderDevBlogMVC2024.Controllers
 
             if (ModelState.IsValid)
             {
+                var existingComment = await _commentService.GetExistingCommentAsync(id);
+                if (existingComment == null)
+                {
+                    return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
+                }
                 try
                 {
+                    existingComment!.Body = comment.Body;
+                    existingComment.Updated = DateTime.Now;
                     await _commentService.UpdateCommentAsync(comment);
                    
                 }
@@ -126,7 +131,7 @@ namespace WonderDevBlogMVC2024.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Posts", new { slug = existingComment.Post!.Slug }, "commentSection");
             }
             await PopulateSelectLists();
             return View(comment);

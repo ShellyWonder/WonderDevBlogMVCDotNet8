@@ -7,7 +7,7 @@ namespace WonderDevBlogMVC2024.Services
         //image delivered to database from the client
         public async Task<byte[]> ConvertFileToByteArrayAsync(IFormFile file)
         {
-            if (file is null) return null;
+            if (file is null) return null!;
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
             return memoryStream.ToArray();

@@ -47,6 +47,14 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                                  .FirstOrDefaultAsync(c=> c.Id == id);
         }
 
+        public async Task<Comment?> GetExistingCommentAsync(int id)
+        {
+            var existingComment = await _context.Comments
+                                 
+                                 .Include(c => c.Post)
+                                 .FirstOrDefaultAsync(c => c.Id == id);
+            return existingComment;
+        }
         public async Task UpdateCommentAsync(Comment comment)
         {
             _context.Comments.Update(comment);

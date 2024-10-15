@@ -25,6 +25,10 @@ namespace WonderDevBlogMVC2024.Services
         {
             await _commentRepository.CreateCommentAsync(comment);
         }
+        public async Task<Comment?>GetExistingCommentAsync(int id)
+        {
+            return await _commentRepository.GetExistingCommentAsync(id);
+        }
         public async Task UpdateCommentAsync(Comment comment)
         {
             await _commentRepository.UpdateCommentAsync(comment);
