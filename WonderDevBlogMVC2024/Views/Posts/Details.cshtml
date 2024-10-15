@@ -1,9 +1,16 @@
-﻿@model WonderDevBlogMVC2024.Models.Post
+﻿@using MailKit
+@using Microsoft.AspNetCore.Identity
+@using WonderDevBlogMVC2024.Data
+@using WonderDevBlogMVC2024.Services;
+@using WonderDevBlogMVC2024.Services.Interfaces
+@inject IImageService imageService;
+@inject UserManager<ApplicationUser> userManager;
+@model WonderDevBlogMVC2024.Models.Post
 
 
 <PageTitle>@Model.Title</PageTitle>
 <!--Page Banner-->
-<div class="hero-bg" style="@($"--bg-img:url(https://image.tmdb.org/t/p/original/{Model.ImageData})")">
+<!--add hero section here-->
     <div class="hero-container-xxl d-flex flex-column flex-md-row">
         <!--title content goes here-->
         <div class="flex-grow-1 d-flex align-items-center justify-content-center justify-content-md-end">
@@ -65,7 +72,60 @@
                 }
                     <a asp-action="Index">Back to List</a>
         </div>
+        <hr/>
+        <button id="commentSection" class="btn btn-sm btn-dark btn-block">@Model!.Comments.Count COMMENT(s)</button>
+
+    @foreach(var comment in Model!.Comments)
+    {
+    <div class="media media-border p-0 mb-2 bg-light">
     @* //Init imageService(Commentator's image') when comments are implemented in comments component *@
+        <img class="mr-3 mt-3 rounded-circle" style="width:60px;" src="@imageService.DecodeImage(comment.Commentator!.ImageData!, comment.Commentator!.ImageType!)" />
+        <div class="media-body">
+            <h4>@comment.Commentator.FullName</h4>
+            <small><i>Posted on : @comment.Created.ToString("MMM dd, yyyy")</i></small>
+            <p>@comment.Body</p>
+
+            @if (comment.Moderator is null && comment.Deleted is null && comment.CommentatorId == userManager.GetUserId(User))
+            {
+                <hr/>
+                <button data-bs-toggle="modal" data-bs-target="#editModal"class="btn-sm btn-dark float-right font-weight-bold">EDIT</button>
+            }
+
+        </div>
+    </div>
+        @*Modals*@
+        <div class="modal" id="editModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Editing Comment . . .</h4>
+
+                    </div>
+                <!--Modal body-->
+                    <div class="modal-body">
+                        <form asp-action="Edit" asp-controller="Comments"> 
+                            @Html.Hidden("Id", comment.Id)
+                            <div class="form-group">
+                                <textarea name="Body"class="form-control" required>@comment.Body</textarea>
+                            </div>
+
+                        <button type="submit" class="btn-sm btn-dark border-success font-weight-bold">SUBMIT</button>
+
+                        </form>
+                    </div>
+                <!--Modal FOOTER-->
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn-sm btn-dark font-weight-bold" data-bs-dismiss="modal">CLOSE</button>
+
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    }
+
+
 
 
         
@@ -73,4 +133,3 @@
                     
 
 
-}
