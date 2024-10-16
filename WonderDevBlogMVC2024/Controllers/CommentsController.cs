@@ -138,8 +138,40 @@ namespace WonderDevBlogMVC2024.Controllers
         }
         #endregion
 
+        #region POST MODERATE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Moderate(int id, [Bind("Id,Body,ModeratedBody, ModerationReason")] Comment comment)
+        {
+            if (id != comment.Id)
+            {
+                return _errorHandlingService.HandleError($"Comment with ID {id} was not found.");
+            }
+            if (ModelState.IsValid)
+            {
+                var existingComment = await _commentService.GetExistingCommentAsync(id);
+                try
+                {
+                    existingComment!.ModeratedBody = comment.ModeratedBody;
+                    existingComment!.ModerationReason = comment.ModerationReason;
+
+                    existingComment.Moderated = DateTime.Now;
+                    existingComment!.ModeratorId = _userManager.GetUserId(User);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
+                    throw;
+                }
+
+                return RedirectToAction("Details", "Posts", new { slug = existingComment.Post!.Slug }, "commentSection");
+            }
+            return View(comment);
+        }
+            #endregion
+
         #region GET DELETE
-        [Authorize(Roles ="Moderator, Commentator")]
+            [Authorize(Roles ="Moderator, Commentator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
