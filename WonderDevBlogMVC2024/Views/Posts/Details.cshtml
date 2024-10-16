@@ -76,7 +76,7 @@
     </div>
 
 @{
-    var counter = 0;
+    var counter = 0;//Decide if this is unnecessary
 }   
         @if (User.IsInRole("Administrator") || (User.IsInRole("Author")))
                 {
@@ -95,9 +95,9 @@
             <img class="mr-3 mt-3 rounded-circle" style="width:60px;" src="@imageService.DecodeImage(comment.Commentator!.ImageData!, comment.Commentator!.ImageType!)" />
             <div class="media-body">
                 <h4>@comment.Commentator.FullName</h4>
-                <small>
-                    <i>
-                     @if (comment.Moderated != null)
+            <small>
+                <i>
+                    @if (comment.Moderated != null)
                     {
                         <span class="small">
                             <span class="font-weight-bolder">
@@ -109,11 +109,27 @@
                     else
                     {
                         <span class="small font-italic">Posted on : @comment.Created.ToString("MMM dd, yyyy")</span>
-                    }    
+                    }
+                </i>
+            </small>
 
-                    </i>
-                </small>
+            @if (!string.IsNullOrEmpty(comment.Body))
+            {
+                @* Display the moderated body if it exists *@
+                <p>@(comment.Moderated != null ? comment.ModeratedBody : comment.Body)</p>
+            }
+            else if (comment.Deleted is null)
+            {
+                // Handle the case where the comment is not deleted but also not empty or moderated
                 <p>@comment.Body</p>
+            }
+            else
+            {
+                <p class="text-muted"><em>This comment has been deleted.</em></p>
+                
+            }
+
+               
 
               <!--RENDER EDIT BUTTON-->
                 @if (comment.Moderator is null && comment.Deleted is null && comment.CommentatorId == userManager.GetUserId(User))
@@ -128,8 +144,14 @@
                     <div class="row">
                         <div class="col-2">
                             <button data-bs-toggle="modal" data-bs-target="@($"#moderateModal{counter}")" class="btn-sm btn-dark float-right font-weight-bold">MODERATE</button>
-
                         </div>
+                        <div class="col-2">
+                            <form asp-action="Delete" asp-controller="Comments">
+                                @Html.Hidden("Id", comment.Id)
+                                @Html.Hidden("Slug",comment.Post!.Slug)
+                                <button type="submit" class="btn-sm btn-dark float-right font-weight-bold">DELETE</button>
+                            </form>
+                    </div>
                     </div>
                 }
             </div>
