@@ -192,10 +192,10 @@ namespace WonderDevBlogMVC2024.Controllers
         #region POST DELETE        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, string slug)
         {
             await _commentService.DeleteCommentAsync(id);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Posts", new { slug }, "commentSection");
         }
         #endregion
 
