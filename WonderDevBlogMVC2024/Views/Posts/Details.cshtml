@@ -1,6 +1,7 @@
 ﻿@using MailKit
 @using Microsoft.AspNetCore.Identity
 @using WonderDevBlogMVC2024.Data
+@using WonderDevBlogMVC2024.Enums
 @using WonderDevBlogMVC2024.Services;
 @using WonderDevBlogMVC2024.Services.Interfaces
 @inject IImageService imageService;
@@ -12,10 +13,14 @@
 <!--Page Banner-->
 <!--add hero section here-->
     <div class="hero-container-xxl d-flex flex-column flex-md-row">
+        @**********************************
+               BLOG POST DISPLAY
+        **********************************@     
         <!--title content goes here-->
         <div class="flex-grow-1 d-flex align-items-center justify-content-center justify-content-md-end">
             <div class="mt-3 text-center text-md-end pe-3">
                 <h1 class="text-light">@Model.Title?.ToUpper()</h1>
+            <!--abstract goes here-->
                 <h2 class="text-light">@Model.Abstract</h2>
             </div>
             <article>
@@ -31,7 +36,12 @@
             </article>
             <hr/>
         </div>
-        @if (User.Identity!.IsAuthenticated)
+
+    @**********************************
+          COMMENT FORM DISPLAY
+    **********************************@
+
+    @if (User.Identity!.IsAuthenticated)
         {
             <form asp-action="Create" asp-controller="Comments" method="post">
                 @Html.Hidden("PostId", Model.Id)
@@ -46,7 +56,9 @@
         {
             <a class="btn btn-dark btn-block btn-sm" asp-area="Identity" asp-page="/Account/Login">Login to Comment</a>
         }
-
+    @**********************************
+            TAG DISPLAY
+    **********************************@
         <article>
             <div class="row">
                 <div class="col text-center h3">Post Tags</div>
@@ -59,42 +71,75 @@
                         <a btn btn-warning btn-sm btn-outline-dark asp-action="TagIndex" asp-route-tag="@tag.Text?.ToLower()">#@tag.Text</a>
                     }
                 </div>
-
             </div>
-
         </article>
     </div>
-        <div>
+
+@{
+    var counter = 0;
+}   
         @if (User.IsInRole("Administrator") || (User.IsInRole("Author")))
                 {
                    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
                    <span> | </span>
                 }
                     <a asp-action="Index">Back to List</a>
-        </div>
+       
         <hr/>
         <button id="commentSection" class="btn btn-sm btn-dark btn-block">@Model!.Comments.Count COMMENT(s)</button>
 
     @foreach(var comment in Model!.Comments)
     {
-    <div class="media media-border p-0 mb-2 bg-light">
-    @* //Init imageService(Commentator's image') when comments are implemented in comments component *@
-        <img class="mr-3 mt-3 rounded-circle" style="width:60px;" src="@imageService.DecodeImage(comment.Commentator!.ImageData!, comment.Commentator!.ImageType!)" />
-        <div class="media-body">
-            <h4>@comment.Commentator.FullName</h4>
-            <small><i>Posted on : @comment.Created.ToString("MMM dd, yyyy")</i></small>
-            <p>@comment.Body</p>
+        <div class="media media-border p-0 mb-2 bg-light">
+        @* Commentator's image *@
+            <img class="mr-3 mt-3 rounded-circle" style="width:60px;" src="@imageService.DecodeImage(comment.Commentator!.ImageData!, comment.Commentator!.ImageType!)" />
+            <div class="media-body">
+                <h4>@comment.Commentator.FullName</h4>
+                <small>
+                    <i>
+                     @if (comment.Moderated != null)
+                    {
+                        <span class="small">
+                            <span class="font-weight-bolder">
+                                Moderated <span class="text-danger font-italic">(@comment.ModerationReason.ToString().ToLower())</span>
+                            </span>
+                            : @comment.Moderated?.ToString("MMM dd, yyyy")
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="small font-italic">Posted on : @comment.Created.ToString("MMM dd, yyyy")</span>
+                    }    
 
-            @if (comment.Moderator is null && comment.Deleted is null && comment.CommentatorId == userManager.GetUserId(User))
-            {
-                <hr/>
-                <button data-bs-toggle="modal" data-bs-target="#editModal"class="btn-sm btn-dark float-right font-weight-bold">EDIT</button>
-            }
+                    </i>
+                </small>
+                <p>@comment.Body</p>
 
+              <!--RENDER EDIT BUTTON-->
+                @if (comment.Moderator is null && comment.Deleted is null && comment.CommentatorId == userManager.GetUserId(User))
+                {
+                    <hr/>
+                    <button data-bs-toggle="modal" data-bs-target="@($"#editModal{counter}")" class="btn-sm btn-dark float-right font-weight-bold">EDIT</button>
+                }
+                <!--RENDER MODERATE & DELETE BUTTONS-->
+                @if (User.IsInRole(BlogRole.Moderator.ToString()) && comment.Deleted is null)
+                {
+                    <hr/>
+                    <div class="row">
+                        <div class="col-2">
+                            <button data-bs-toggle="modal" data-bs-target="@($"#moderateModal{counter}")" class="btn-sm btn-dark float-right font-weight-bold">MODERATE</button>
+
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
-        @*Modals*@
-        <div class="modal" id="editModal">
+
+        @**********************************
+                    MODALS
+        **********************************@
+        <!--EDIT MODAL-->
+        <div class="modal" id="@($"#editModal{counter}")">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -123,6 +168,48 @@
                 </div>
             </div>
         </div>
+         
+        <!--MODERATE MODAL-->
+        <div class="modal" id="@($"#moderateModal{counter}")">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Moderating Comment . . .</h4>
+
+                    </div>
+                <!--Modal body-->
+                    <div class="modal-body">
+                        <form asp-action="Moderate" asp-controller="Comments"> 
+                            @Html.Hidden("Id", comment.Id)
+                            @Html.Hidden("Body", comment.Body)
+                            <div class="form-group">
+                                <label class="control-label">Original Comment</label>
+                                <textarea disabled class="form-control" style="resize:none">@comment.Body</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Moderated Comment</label>
+                                <textarea reqired name="ModeratedBody" class="form-control" style="resize:none">@comment.Body</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Moderation Reason</label>
+                                <select class="form-control" asp-for="@comment.ModerationReason" name="ModerationReason" asp-items="Html.GetEnumSelectList<ModerationReason>()"></select>
+                            </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn-sm btn-dark border-success font-weight-bold">SUBMIT</button>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn-sm btn-dark font-weight-bold" data-bs-dismiss="modal">CLOSE</button>
+                                </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        counter++;
     }
 
 
