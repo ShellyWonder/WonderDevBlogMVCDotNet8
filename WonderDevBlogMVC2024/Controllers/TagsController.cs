@@ -173,7 +173,7 @@ namespace WonderDevBlogMVC2024.Controllers
             var authors = await _applicationUserService.GetAllPostAuthorsAsync();
             var posts = await _postService.GetAllPostsAsync();
 
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", tag?.AuthorId);
+            ViewData["AuthorId"] = new SelectList(authors, "AuthorId", "FullName", tag?.AuthorId);
             ViewData["PostId"] = new SelectList(posts, "Id", "Id", tag?.PostId);
         }  
         #endregion

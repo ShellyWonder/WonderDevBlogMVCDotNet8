@@ -65,7 +65,6 @@ namespace WonderDevBlogMVC2024.Controllers
             var posts = await _postService.GetAllPostsByStateAsync(PostState.ProductionReady, pageNumber, pageSize, id);
             return View(posts);
         }
-
         #endregion
 
         #region GET DETAILS  
