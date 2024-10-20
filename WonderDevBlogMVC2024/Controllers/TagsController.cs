@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,22 +14,26 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    #region PRIMARY CONSTRUCTOR
     public class TagsController(ITagService tagsService,
-                                 IApplicationUserService applicationUserService,
-                                  IPostService postService) : Controller
+                            IApplicationUserService applicationUserService,
+                             IPostService postService) : Controller
     {
+        
         private readonly ITagService _tagService = tagsService;
         private readonly IApplicationUserService _applicationUserService = applicationUserService;
         private readonly IPostService _postService = postService;
+        #endregion
 
-        // GET: Tags
+    #region GET TAGS
         public async Task<IActionResult> Index()
         {
             var tags = await _tagService.GetAllTagsAsync();
             return View(tags);
         }
+        #endregion
 
-        // GET: Tags/Details/5
+    #region GET DETAILS
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,29 +49,34 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(tag);
         }
+        #endregion
 
-        // GET: Tags/Create
+    #region GET CREATE
+        [Authorize(Roles = "Author, Administrator")]
         public async Task<IActionResult> Create()
         {
             await PopulateDropDownLists();
             return View();
         }
+        #endregion
 
-        // POST: Tags/Create
+    #region POST CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PostId,AuthorId,TagText")] Tag tag)
         {
             if (ModelState.IsValid)
             {
-               await _tagService.AddTagAsync(tag.Text!, tag.PostId, tag.AuthorId!);
+                await _tagService.AddTagAsync(tag.Text!, tag.PostId, tag.AuthorId!);
                 return RedirectToAction(nameof(Index));
             }
             await PopulateDropDownLists();
             return View(tag);
         }
+        #endregion
 
-        // GET: Tags/Edit/5
+    #region GET EDIT
+        [Authorize(Roles = "Author, Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,9 +93,10 @@ namespace WonderDevBlogMVC2024.Controllers
             await PopulateDropDownLists();
             return View(tag);
         }
+        #endregion
 
-        // POST: Tags/Edit/5
-       [HttpPost]
+    #region POST EDIT
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PostId,AuthorId,Text")] Tag tag)
         {
@@ -98,7 +109,7 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 try
                 {
-                   
+
                     await _tagService.UpdateTagAsync(tag);
                 }
                 catch (DbUpdateConcurrencyException)
@@ -117,8 +128,10 @@ namespace WonderDevBlogMVC2024.Controllers
             await PopulateDropDownLists();
             return View(tag);
         }
+        #endregion
 
-        // GET: Tags/Delete/5
+    #region GET DELETE
+        [Authorize(Roles = "Author, Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -134,8 +147,9 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(tag);
         }
+        #endregion
 
-        // POST: Tags/Delete/5
+    #region POST DELETE
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -143,20 +157,26 @@ namespace WonderDevBlogMVC2024.Controllers
             await _tagService.DeleteTagAsync(id);
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+    #region TAG EXISTS
         private bool TagExists(int id)
         {
             return _tagService.TagExists(id);
         }
+        #endregion
 
+    #region POPULATE DROP DOWN LISTS
         private async Task PopulateDropDownLists(Tag? tag = null)
         {
-            //NOTE: CHANGE VAR DEFINITIONS WHEN ROLES ARE IMPLEMENTED
-            var authors = await _applicationUserService.GetAllUsersAsync();
+            
+            var authors = await _applicationUserService.GetAllPostAuthorsAsync();
             var posts = await _postService.GetAllPostsAsync();
 
             ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", tag?.AuthorId);
             ViewData["PostId"] = new SelectList(posts, "Id", "Id", tag?.PostId);
-        }
+        }  
+        #endregion
+
     }
 }
