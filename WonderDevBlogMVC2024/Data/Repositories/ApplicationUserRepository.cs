@@ -32,7 +32,27 @@ namespace WonderDevBlogMVC2024.Data.Repositories
             return user;
         }
 
-       
+            public async Task<IEnumerable<string?>> GetAllAuthorsAsync()
+            {
+            var blogAuthors = _context.Blogs
+                .Where(b => b.Author != null)
+                .Select(b => b.Author!.FullName)
+                .Distinct();
+
+            var postAuthors = _context.Posts
+                .Where(p => p.Author != null)
+                .Select(p => p.Author!.FullName)
+                .Distinct();
+
+            var allAuthors = blogAuthors
+                .Union(postAuthors)
+                .Distinct();
+
+            return await allAuthors.ToListAsync();
+            }
+
     }
-    
+
+
 }
+    
