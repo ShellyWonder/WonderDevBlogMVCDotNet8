@@ -44,7 +44,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-        //Note to Dev: no longer needed??
+        
         public async Task<IEnumerable<Blog>> GetAllBlogsAsync()
         {
             return await _context.Blogs.Include(b => b.Author)

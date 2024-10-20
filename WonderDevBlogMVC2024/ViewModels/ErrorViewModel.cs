@@ -1,4 +1,4 @@
-namespace WonderDevBlogMVC2024.Models
+namespace WonderDevBlogMVC2024.ViewModels
 {
     public class ErrorViewModel
     {

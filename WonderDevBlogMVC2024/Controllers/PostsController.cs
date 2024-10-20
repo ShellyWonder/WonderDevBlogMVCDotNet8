@@ -314,11 +314,10 @@ namespace WonderDevBlogMVC2024.Controllers
         {
             {
 
-                //NOTE: CHANGE VAR AUTHOR WHEN ROLES ARE IMPLEMENTED
-                var authors = await _applicationUserService.GetAllUsersAsync();
+                var authors = await _applicationUserService.GetAllPostAuthorsAsync();   
                 var blogs = await _blogService.GetAllBlogsAsync();
-                //may not use AuthorId
-                //ViewData["AuthorId"] = new SelectList(authors, "Id", "Id", post?.AuthorId);
+
+                ViewData["AuthorId"] = new SelectList(authors, "AuthorId", "FullName", post?.AuthorId);
                 ViewData["BlogId"] = new SelectList(blogs, "Id", "Name", post?.BlogId);
 
             }

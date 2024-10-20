@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
+using WonderDevBlogMVC2024.ViewModels;
 
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
@@ -31,25 +33,45 @@ namespace WonderDevBlogMVC2024.Data.Repositories
 
             return user;
         }
+        //pulls both BLOG & POST Authors
+        public async Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync()
+        {
+        var blogAuthors = await GetAllBlogAuthorsAsync();
 
-            public async Task<IEnumerable<string?>> GetAllAuthorsAsync()
-            {
+        var postAuthors = await GetAllPostAuthorsAsync();
+
+            return blogAuthors
+            .Union(postAuthors)
+            .Distinct();
+   
+        }
+       public async Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync()
+        {
             var blogAuthors = _context.Blogs
                 .Where(b => b.Author != null)
-                .Select(b => b.Author!.FullName)
+                .Select(p => new AuthorViewModel
+                {
+                    Id = p.Author!.Id,
+                    FullName = p.Author!.FullName
+                })
                 .Distinct();
 
+            return await blogAuthors.ToListAsync();
+
+        }
+       public async Task<IEnumerable<AuthorViewModel?>> GetAllPostAuthorsAsync()
+       {
             var postAuthors = _context.Posts
                 .Where(p => p.Author != null)
-                .Select(p => p.Author!.FullName)
+                .Select(p => new AuthorViewModel
+                {
+                    Id = p.Author!.Id,            
+                    FullName = p.Author!.FullName  
+                })
                 .Distinct();
 
-            var allAuthors = blogAuthors
-                .Union(postAuthors)
-                .Distinct();
-
-            return await allAuthors.ToListAsync();
-            }
+            return await postAuthors.ToListAsync();
+       }
 
     }
 
