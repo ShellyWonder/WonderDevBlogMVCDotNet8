@@ -1,6 +1,7 @@
 ﻿using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Models;
+using WonderDevBlogMVC2024.ViewModels;
 using X.PagedList;
 
 namespace WonderDevBlogMVC2024.Services.Interfaces
@@ -14,7 +15,8 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
         Task UpdateBlogAsync(Blog blog, string userId);
         Task DeleteBlogAsync(int id);
         Task<bool> BlogExistsAsync(int id);
-        Task<IEnumerable<ApplicationUser>> GetAllAuthorsAsync();
+        Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync();
+        Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync();
 
 
 
