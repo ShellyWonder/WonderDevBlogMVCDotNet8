@@ -32,6 +32,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET DETAILS
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -78,7 +79,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET EDIT
-        [Authorize(Roles = "Commentator,Moderator")]
+        [Authorize(Roles = "Commentator, Moderator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -139,6 +140,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region POST MODERATE
+        [Authorize(Roles ="Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Moderate(int id, [Bind("Id,Body,ModeratedBody, ModerationReason")] Comment comment)

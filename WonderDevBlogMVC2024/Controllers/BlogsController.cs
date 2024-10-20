@@ -30,6 +30,7 @@ namespace WonderDevBlogMVC2024.Controllers
         #endregion
 
         #region GET BLOG DETAILS
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -183,7 +184,7 @@ namespace WonderDevBlogMVC2024.Controllers
         }
         #endregion
 
-        #region POP AUTHORS
+        #region POPULATE AUTHORS
         private async Task PopulateAuthorsDropDownList(object? selectedAuthor = null)
         {
             var authors = await _blogService.GetAllAuthorsAsync();
