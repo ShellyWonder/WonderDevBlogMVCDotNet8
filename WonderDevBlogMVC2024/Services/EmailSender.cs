@@ -8,11 +8,14 @@ using WonderDevBlogMVC2024.Services.Interfaces;
 
 namespace WonderDevBlogMVC2024.Services
 {
+#region PRIMARY CONSTRUCTOR
     public class EmailSender(IOptions<MailSettings> mailSettings) : IBlogEmailSender
     {
-       private readonly MailSettings _mailSettings = mailSettings.Value;
+        private readonly MailSettings _mailSettings = mailSettings.Value; 
+        #endregion
 
-        public  async Task SendContactEmailAsync(string emailFrom, string name, string subject, string htmlMessage)
+#region SEND CONTACT EMAIL
+        public async Task SendContactEmailAsync(string emailFrom, string name, string subject, string htmlMessage)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
@@ -31,10 +34,11 @@ namespace WonderDevBlogMVC2024.Services
             await smtp.SendAsync(email);
 
             smtp.Disconnect(true);
-        }
-       
+        } 
+        #endregion
 
-        public  async Task SendEmailAsync(string emailTo, string subject, string htmlMessage)
+#region SEND EMAIL
+        public async Task SendEmailAsync(string emailTo, string subject, string htmlMessage)
         {
             var email = new MimeMessage
             {
@@ -47,19 +51,21 @@ namespace WonderDevBlogMVC2024.Services
             {
                 HtmlBody = htmlMessage
 
-            };            
+            };
 
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
             await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-             await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
 
             await smtp.SendAsync(email);
 
             smtp.Disconnect(true);
-        }
+        } 
+        #endregion
+
     }
     
 }

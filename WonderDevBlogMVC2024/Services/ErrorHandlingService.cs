@@ -8,6 +8,7 @@ namespace WonderDevBlogMVC2024.Services
 {
     public class ErrorHandlingService : IErrorHandlingService
     {
+        #region HANDLE ERROR
         public ViewResult HandleError(string errorMessage)
         {
             var errorModel = new ErrorModel
@@ -26,6 +27,7 @@ namespace WonderDevBlogMVC2024.Services
                     Model = errorModel
                 }
             };
-        }
+        } 
+        #endregion
     }
 }
