@@ -10,14 +10,17 @@ using WonderDevBlogMVC2024.ViewModels;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    #region PRIMARY CONSTRUCTOR
     public class UserRolesController(IRolesService rolesService,
-                                     IApplicationUserService ApplicationUserService,
-                                     UserManager<ApplicationUser> userManager) : Controller
+                                 IApplicationUserService ApplicationUserService,
+                                 UserManager<ApplicationUser> userManager) : Controller
     {
         private readonly IRolesService _rolesService = rolesService;
         private readonly IApplicationUserService _applicationUserService = ApplicationUserService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        #endregion
 
+    #region MANAGE USER ROLES
         public async Task<IActionResult> ManageUserRoles()
         {
             //add instance of the view model
@@ -34,8 +37,10 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(model);
         }
-        
-        
+
+        #endregion
+
+    #region ASSIGN ROLE
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AssignRole(string userId, BlogRole role)
         {
@@ -61,7 +66,8 @@ namespace WonderDevBlogMVC2024.Controllers
             }
 
             return View(); // return to an appropriate view
-        }
+        } 
+        #endregion
 
     }
 }

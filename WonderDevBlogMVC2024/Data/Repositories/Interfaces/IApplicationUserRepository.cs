@@ -4,17 +4,18 @@ namespace WonderDevBlogMVC2024.Data.Repositories.Interfaces
 {
     public interface IApplicationUserRepository
     {
-        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
+        Task<IEnumerable<UserViewModel>> GetAllUsersAsync();
         Task<ApplicationUser?> GetUserByIdAsync(string id);
-        Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync();
+        Task<IEnumerable<UserViewModel?>> GetAllAuthorsAsync();
                                         
-        Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync();
-        Task<IEnumerable<AuthorViewModel?>> GetAllPostAuthorsAsync();
+        Task<IEnumerable<UserViewModel?>> GetAllBlogAuthorsAsync();
+        Task<IEnumerable<UserViewModel?>> GetAllPostAuthorsAsync();
 
-
-        //Task<ApplicationUser> GetAuthorById(string id);
-        //Task<IEnumerable<ApplicationUser>> GetAllModerators();
-        //Task<ApplicationUser> GetModeratorById(string id);
+        Task<IEnumerable<UserViewModel>> GetAllModerators();
+        Task<UserViewModel> GetModeratorById(string id);
+        Task<UserViewModel?> GetAuthorByIdAsync(string id);
+        Task<UserViewModel?> GetBlogAuthorByIdAsync(string id);
+        Task<UserViewModel?> GetPostAuthorByIdAsync(string id);
 
     }
 }

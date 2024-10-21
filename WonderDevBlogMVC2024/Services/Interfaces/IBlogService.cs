@@ -15,8 +15,8 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
         Task UpdateBlogAsync(Blog blog, string userId);
         Task DeleteBlogAsync(int id);
         Task<bool> BlogExistsAsync(int id);
-        Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync();
-        Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync();
+        Task<IEnumerable<UserViewModel?>> GetAllBlogAuthorsAsync();
+        Task<IEnumerable<UserViewModel?>> GetAllAuthorsAsync();
 
 
 

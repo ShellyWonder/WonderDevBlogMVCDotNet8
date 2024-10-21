@@ -64,14 +64,14 @@ namespace WonderDevBlogMVC2024.Services
         #endregion
 
 #region GET ALL BLOG AUTHORS
-        public async Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync()
+        public async Task<IEnumerable<UserViewModel?>> GetAllBlogAuthorsAsync()
         {
             return await _applicationUserService.GetAllBlogAuthorsAsync();
         } 
         #endregion
 
 #region GET ALL AUTHORS
-        public async Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync()
+        public async Task<IEnumerable<UserViewModel?>> GetAllAuthorsAsync()
         {  
             //pulls down both BLOG & POST authors as potential authors of a new blog.
             return await _applicationUserService.GetAllAuthorsAsync();

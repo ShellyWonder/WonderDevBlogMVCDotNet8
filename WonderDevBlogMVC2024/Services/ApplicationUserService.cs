@@ -20,7 +20,7 @@ namespace WonderDevBlogMVC2024.Services
 
  #region GET ALL AUTHORS
         //pulls authors from both POSTS & BLOGS tables
-        public async Task<IEnumerable<AuthorViewModel?>> GetAllAuthorsAsync()
+        public async Task<IEnumerable<UserViewModel?>> GetAllAuthorsAsync()
         {
             return await _applicationUserRepository.GetAllAuthorsAsync();
         } 
@@ -28,7 +28,7 @@ namespace WonderDevBlogMVC2024.Services
 
  #region GET ALL BLOG AUTHORS
         //pulls authors from BLOGS tables
-        public async Task<IEnumerable<AuthorViewModel?>> GetAllBlogAuthorsAsync()
+        public async Task<IEnumerable<UserViewModel?>> GetAllBlogAuthorsAsync()
         {
             return await _applicationUserRepository.GetAllBlogAuthorsAsync();
         } 
@@ -36,7 +36,7 @@ namespace WonderDevBlogMVC2024.Services
          
  #region GET ALL POST AUTHORS
         //pulls authors from both POSTS 
-        public async Task<IEnumerable<AuthorViewModel?>> GetAllPostAuthorsAsync()
+        public async Task<IEnumerable<UserViewModel?>> GetAllPostAuthorsAsync()
         {
             return await _applicationUserRepository.GetAllPostAuthorsAsync();
         } 
