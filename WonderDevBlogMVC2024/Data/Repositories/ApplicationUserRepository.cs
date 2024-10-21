@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using WonderDevBlogMVC2024.Data.Repositories.Interfaces;
 using WonderDevBlogMVC2024.ViewModels;
@@ -6,13 +7,15 @@ using WonderDevBlogMVC2024.ViewModels;
 namespace WonderDevBlogMVC2024.Data.Repositories
 {
     #region PRIMARY CONSTRUCTOR
-    public class ApplicationUserRepository(ApplicationDbContext context) : IApplicationUserRepository
+    public class ApplicationUserRepository(ApplicationDbContext context,
+                                            UserManager<ApplicationUser> userManager) : IApplicationUserRepository
     {
-        private readonly ApplicationDbContext _context = context; 
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
         #endregion
 
-    #region GET ALL USERS
-        public async Task<IEnumerable<UserViewModel>> GetAllUsersAsync()
+        #region GET ALL USERS
+        public async Task<IEnumerable<UserViewModel?>> GetAllUsersAsync()
         {
 
             var users = _context.Users
@@ -50,7 +53,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         #endregion
 
     #region GET ALL MODERATORS
-        public async Task<IEnumerable<UserViewModel>> GetAllModerators()
+        public async Task<IEnumerable<UserViewModel?>> GetAllModerators()
         {
             var moderators = _context.Comments
                 .Where(c => c.Moderator != null)
@@ -66,7 +69,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         #endregion
 
  #region GET MODERATOR BY ID/FULL NAME
-        public async Task<UserViewModel> GetModeratorById(string id)
+        public async Task<UserViewModel?> GetModeratorById(string id)
 
         {
            var moderator = await _context.Users
@@ -136,7 +139,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
             return await postAuthors.ToListAsync();
         }
         #endregion
-
+        
 #region GET AUTHOR BY ID
         public async Task<UserViewModel?> GetAuthorByIdAsync(string id)
         {
@@ -169,7 +172,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         }
         #endregion
 
-         #region GET POST AUTHOR BY ID
+        #region GET POST AUTHOR BY ID
         public async Task<UserViewModel?> GetPostAuthorByIdAsync(string id)
         {
             //search for the author in Posts
@@ -182,11 +185,45 @@ namespace WonderDevBlogMVC2024.Data.Repositories
                 })
                 .FirstOrDefaultAsync();
                  return postAuthor; 
-        } 
+        }
+        #endregion
+
+        #region GET ALL ADMINISTRATORS
+        public async Task<IEnumerable<UserViewModel?>> GetAllAdministratorsAsync()
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync("Administrator");
+
+            var administrators = usersInRole
+                .Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName 
+                })
+                .Distinct();
+
+            return administrators;
+        }
+        #endregion
+
+        #region GET ADMINISTRATOR BY ID/FULL NAME
+        public async Task<UserViewModel?> GetAdministratorByIdAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user != null && await _userManager.IsInRoleAsync(user, "Administrator"))
+            {
+                return new UserViewModel
+                {
+                    Id = user.Id,
+                    FullName = user.FullName 
+                };
+            }
+
+            throw new KeyNotFoundException($"Administrator with ID {id} was not found.");
+        }
         #endregion
 
     }
-
 
 }
     
