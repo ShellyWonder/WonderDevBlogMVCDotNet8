@@ -35,11 +35,16 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         /// Therefore, GetUserByIdAsync has a string id parameter)
         /// </summary>
 
-        public async Task<ApplicationUser?> GetUserByIdAsync(string id)
+        public async Task<UserViewModel?> GetUserByIdAsync(string id)
         {
             // Await the result and store it in a variable
             var user = await _context.Users
                                      .Where(x => x.Id == id)
+                                     .Select(x => new UserViewModel
+                                     {
+                                         Id = x.Id,
+                                         FullName = x.FullName
+                                     })
                                      .SingleOrDefaultAsync();
 
             // Check if the user is null and throw an exception if needed
@@ -53,7 +58,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         #endregion
 
     #region GET ALL MODERATORS
-        public async Task<IEnumerable<UserViewModel?>> GetAllModerators()
+        public async Task<IEnumerable<UserViewModel?>> GetAllModeratorsAsync()
         {
             var moderators = _context.Comments
                 .Where(c => c.Moderator != null)
@@ -69,7 +74,7 @@ namespace WonderDevBlogMVC2024.Data.Repositories
         #endregion
 
  #region GET MODERATOR BY ID/FULL NAME
-        public async Task<UserViewModel?> GetModeratorById(string id)
+        public async Task<UserViewModel?> GetModeratorByIdAsync(string id)
 
         {
            var moderator = await _context.Users
