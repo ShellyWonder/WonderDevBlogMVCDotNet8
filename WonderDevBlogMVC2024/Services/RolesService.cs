@@ -5,9 +5,10 @@ using System.ComponentModel.Design;
 using System.Data;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
+using WonderDevBlogMVC2024.Services.Interfaces;
 
 
-namespace WonderDevBlogMVC2024.Services.Interfaces
+namespace WonderDevBlogMVC2024.Services
 {
     #region PRIMARY CONSTRUCTOR
     public class RolesService(UserManager<ApplicationUser> userManager,
@@ -50,7 +51,7 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
 
                 throw;
             }
-            
+
         }
         #endregion
 
@@ -90,7 +91,7 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
         {
             try
             {
-                bool result = (await _userManager.IsInRoleAsync(user, roleName));
+                bool result = await _userManager.IsInRoleAsync(user, roleName);
                 return result;
             }
             catch (Exception)
@@ -133,6 +134,6 @@ namespace WonderDevBlogMVC2024.Services.Interfaces
             }
             return false;
         }
-#endregion
+        #endregion
     }
 }

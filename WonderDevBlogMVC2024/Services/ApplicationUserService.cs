@@ -33,31 +33,44 @@ namespace WonderDevBlogMVC2024.Services
         }
         #endregion
 
-        #region GET AUTHOR BY ID
+#region GET AUTHOR BY ID
         public async Task<UserViewModel?> GetAuthorByIdAsync(string id)
         {
             return await _applicationUserRepository.GetAuthorByIdAsync(id);
-        } 
+        }
         #endregion
 
+#region GET BLOG AUTHOR BY ID
         public async Task<UserViewModel?> GetBlogAuthorByIdAsync(string id)
         {
             return await _applicationUserRepository.GetBlogAuthorByIdAsync(id);
         }
-        public async Task<UserViewModel?> GetPostAuthorByIdAsync(string id) 
+
+        #endregion
+
+#region GET POST AUTHOR BY ID 
+        public async Task<UserViewModel?> GetPostAuthorByIdAsync(string id)
         {
             return await _applicationUserRepository.GetPostAuthorByIdAsync(id);
         }
-        public async Task<IEnumerable<UserViewModel?>> GetAllAdministratorsAsync() 
+
+        #endregion
+
+#region GET ALL ADMINISTRATORS
+        public async Task<IEnumerable<UserViewModel?>> GetAllAdministratorsAsync()
         {
-            return  await _applicationUserRepository.GetAllAdministratorsAsync();
+            return await _applicationUserRepository.GetAllAdministratorsAsync();
         }
-        public async Task<UserViewModel?> GetAdministratorByIdAsync(string id) 
+        #endregion
+
+#region GET ADMINISTRATOR BY ID
+        public async Task<UserViewModel?> GetAdministratorByIdAsync(string id)
         {
             return await _applicationUserRepository.GetAdministratorByIdAsync(id);
-        }
+        } 
+        #endregion
 
-        #region GET ALL BLOG AUTHORS
+#region GET ALL BLOG AUTHORS
         //pulls authors from BLOGS tables
         public async Task<IEnumerable<UserViewModel?>> GetAllBlogAuthorsAsync()
         {
@@ -87,8 +100,6 @@ namespace WonderDevBlogMVC2024.Services
         }
  
         #endregion
-
-
 
     }
 }
