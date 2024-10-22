@@ -1,7 +1,6 @@
-﻿ 
-
-
-@model IEnumerable<ApplicationUser>
+﻿@using WonderDevBlogMVC2024.Enums
+ 
+@model IEnumerable<WonderDevBlogMVC2024.ViewModels.ManageUserRolesViewModel>
 
 
 <div class="row">
@@ -12,25 +11,32 @@
             <div class="card col-4 m-3">
                 <div class="card-body">
                     <p class="text-muted font-13 m-b-30">
-                        This form displays the current roles assigned to the user: <strong class="text-info">@user.ApplicationUser.FullName</strong>.
+                        This form displays the current roles assigned to the user: <strong class="text-info">@user.ApplicationUser?.FullName</strong>.
                         Use the dropdown to select the roles this user should be assigned.
                         Once roles are selected, click "Assign Roles" to submit the form.
                     </p>
                     <hr />
                     <form asp-action="ManageUserRoles" asp-controller="UserRoles" method=post>
-                        <div>
-                            <label>@user.UserName</label>
+                        <input type="hidden" asp-for="@user.ApplicationUser!.Id" />
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>@user.ApplicationUser?.FullName</label>
+                                    <select asp-for="@user.SelectedRoles" class="form-control" asp-items="@user.Roles" multiple>
+                                        <option value="">Select a role</option>
+                                        <option value="Administrator">Administrator</option>
+                                        <option value="Moderator">Moderator</option>
+                                        <option value="Author">Author</option>
+                                        <option value="Commentator">Commentator</option>
+                                    </select>
+                                    <hr/>
+                                </div>
+                                    <div class="form-group">
+                                        <input type="hidden" name="userId" value="@user.ApplicationUser!.Id" />
+                                        <button type="submit">Assign Role</button>
 
-                            <select asp-for="Role" asp-items="@(new SelectList(Enum.GetValues(typeof(BlogRole))))">
-                                <option value="">Select a role</option>
-                                <option value="Administrator">Administrator</option>
-                                <option value="Moderator">Moderator</option>
-                                <option value="Author">Author</option>
-                                <option value="Commentator">Commentator</option>
-                            </select>
-
-                            <input type="hidden" name="userId" value="@user.Id" />
-                            <button type="submit">Assign Role</button>
+                                    </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -42,7 +48,13 @@
 
 
 {
-    <form asp-action="AssignRole" method="post">
-       
-    </form>
+    @* <form asp-action="AssignRole" method="post">
+    <select asp-for="@user.SelectedRoles" class="form-control" asp-items="@user.Roles" multiple>
+        <option value="">Select a role</option>
+        <option value="Administrator">Administrator</option>
+        <option value="Moderator">Moderator</option>
+        <option value="Author">Author</option>
+        <option value="Commentator">Commentator</option>
+    </select>
+    </form> *@
 }

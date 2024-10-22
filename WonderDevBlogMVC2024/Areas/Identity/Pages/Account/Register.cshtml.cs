@@ -28,7 +28,6 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
-        private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IBlogEmailSender _emailSender; 
         private readonly IImageService _imageService;
@@ -43,30 +42,17 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
         {
             _userManager = userManager;
             _userStore = userStore;
-            _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
             _imageService = imageService;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public string ReturnUrl { get; set; }
+       public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         /// <summary>
@@ -140,7 +126,6 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
 
         }
 
-  
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -150,17 +135,15 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Set email and username
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                var _emailStore = (IUserEmailStore<ApplicationUser>)_userStore; // Initialize the email store here
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                // Populate additional fields like FirstName, LastName, and optional fields
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
                 user.GitHubUrl = Input.GitHubUrl;
                 user.LinkdInUrl = Input.LinkdInUrl;
 
-                // If an image file was uploaded, convert and store it as ImageData &I ImageType
                 if (Input.ImageFile != null)
                 {
                     user.ImageData = await _imageService.ConvertFileToByteArrayAsync(Input.ImageFile);
@@ -168,19 +151,16 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    // If no image is provided, use the default image "img/avatar_icon.png"
                     user.ImageData = await _imageService.ConvertFileToByteArrayAsync("/img/avatar_icon.png");
-                    user.ImageType = "png"; // Set the file type of the default image
+                    user.ImageType = "png";
                 }
 
-                // Create the user with the provided password
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Generate the email confirmation token
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -191,11 +171,9 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    // Send confirmation email
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    // Check if account confirmation is required before sign-in
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -207,17 +185,14 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
                     }
                 }
 
-                // If there were errors, add them to the ModelState
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
-
 
         private ApplicationUser CreateUser()
         {
@@ -231,15 +206,6 @@ namespace WonderDevBlogMVC2024.Areas.Identity.Pages.Account
                     $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
-        }
-
-        private IUserEmailStore<ApplicationUser> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
-            {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
-            return (IUserEmailStore<ApplicationUser>)_userStore;
         }
     }
 }

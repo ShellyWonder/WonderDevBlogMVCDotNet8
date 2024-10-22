@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WonderDevBlogMVC2024.Data;
 using WonderDevBlogMVC2024.Enums;
 using WonderDevBlogMVC2024.Services;
@@ -20,7 +21,8 @@ namespace WonderDevBlogMVC2024.Controllers
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         #endregion
 
-    #region MANAGE USER ROLES
+        #region MANAGE USER ROLES
+        [HttpGet]
         public async Task<IActionResult> ManageUserRoles()
         {
             //add instance of the view model
@@ -33,6 +35,10 @@ namespace WonderDevBlogMVC2024.Controllers
             {
                 ManageUserRolesViewModel viewModel = new();
                 viewModel.ApplicationUser = user;
+                IEnumerable<string>selected = await _rolesService.GetUserRolesAsync(user);
+                viewModel.Roles = new MultiSelectList( await _rolesService.GetRolesAsync(),"Name", "Name", selected);
+
+                model.Add(viewModel);
             }
 
             return View(model);
