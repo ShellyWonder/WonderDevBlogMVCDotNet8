@@ -14,8 +14,14 @@
             <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
         </form>
     </li>
+        @if (User.IsInRole("Administrator"))
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="UserRoles" asp-action="ManageUserRoles"> Administrator Dashboard</a>
+            </li>
+        }
 }
-else
+        else
 {
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>

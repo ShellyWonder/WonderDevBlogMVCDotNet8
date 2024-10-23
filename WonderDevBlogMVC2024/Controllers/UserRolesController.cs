@@ -11,6 +11,8 @@ using WonderDevBlogMVC2024.ViewModels;
 
 namespace WonderDevBlogMVC2024.Controllers
 {
+    [Authorize]
+
     #region PRIMARY CONSTRUCTOR
     public class UserRolesController(IRolesService rolesService,
                                  IApplicationUserService ApplicationUserService,
@@ -23,6 +25,7 @@ namespace WonderDevBlogMVC2024.Controllers
 
         #region MANAGE USER ROLES
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ManageUserRoles()
         {
             //add instance of the view model
@@ -43,35 +46,32 @@ namespace WonderDevBlogMVC2024.Controllers
 
             return View(model);
         }
-
         #endregion
 
-    #region ASSIGN ROLE
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> AssignRole(string userId, BlogRole role)
+        #region ASSIGN ROLE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        
+        public async Task<IActionResult> ManageUserRoles(ManageUserRolesViewModel model)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            ApplicationUser user = await _userManager.FindByIdAsync(model.ApplicationUser.Id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            var roleName = role.ToString();
-            var result = await _userManager.AddToRoleAsync(user, roleName);
+            IEnumerable<string> roles = await _rolesService.GetUserRolesAsync(user);
+            string userRole = model.SelectedRoles.FirstOrDefault();
 
-            if (result.Succeeded)
+            if (!string.IsNullOrEmpty(userRole))
             {
-                // Success message, redirect to user management page
-                return RedirectToAction("ManageUsers");
+                if (await _rolesService.RemoveUserFromRolesAsync(user, roles))
+                {
+                    await _rolesService.AddUserToRoleAsync(user, userRole);
+                }
             }
 
-            // Handle errors
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return View(); // return to an appropriate view
+            return RedirectToAction(nameof(ManageUserRoles));
         } 
         #endregion
 

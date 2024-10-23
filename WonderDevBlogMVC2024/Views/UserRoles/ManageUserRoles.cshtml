@@ -22,18 +22,12 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label>@user.ApplicationUser?.FullName</label>
-                                    <select asp-for="@user.SelectedRoles" class="form-control" asp-items="@user.Roles" multiple>
-                                        <option value="">Select a role</option>
-                                        <option value="Administrator">Administrator</option>
-                                        <option value="Moderator">Moderator</option>
-                                        <option value="Author">Author</option>
-                                        <option value="Commentator">Commentator</option>
-                                    </select>
+                                    <select asp-for="@user.SelectedRoles" class="form-control" asp-items="@user.Roles" multiple></select>
+
                                     <hr/>
                                 </div>
                                     <div class="form-group">
-                                        <input type="hidden" name="userId" value="@user.ApplicationUser!.Id" />
-                                        <button type="submit">Assign Role</button>
+                                       <button type="submit">Assign Role</button>
 
                                     </div>
                             </div>
@@ -47,14 +41,3 @@
 
 
 
-{
-    @* <form asp-action="AssignRole" method="post">
-    <select asp-for="@user.SelectedRoles" class="form-control" asp-items="@user.Roles" multiple>
-        <option value="">Select a role</option>
-        <option value="Administrator">Administrator</option>
-        <option value="Moderator">Moderator</option>
-        <option value="Author">Author</option>
-        <option value="Commentator">Commentator</option>
-    </select>
-    </form> *@
-}
